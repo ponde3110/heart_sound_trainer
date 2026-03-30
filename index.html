@@ -61,37 +61,40 @@
   backdrop-filter: none;
 
   color: #fff;
+
+  display: flex;            /* ← 追加 */
+  flex-direction: column;   /* ← 追加 */
 }
 
+/* 共通 */
 .hud-panel .label,
 .hud-panel .value,
 .hud-panel .sub {
+  display: block;
   text-shadow: 0 0 8px rgba(0,0,0,0.8);
 }
 
-  .hud-panel .label {
-    display: block;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    color: rgba(255,255,255,0.68);
-  }
+/* 個別 */
+.hud-panel .label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.68);
+}
 
-  .hud-panel .value {
-    display: block;
-    margin-top: 4px;
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1.05;
-    color: #fff;
-    text-shadow: 0 0 14px rgba(124,247,255,0.2);
-  }
+.hud-panel .value {
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(124,247,255,0.2); /* ← 上書き */
+}
 
-  .hud-panel .sub {
-    display: block;
-    margin-top: 3px;
-    font-size: 12px;
-    min-height: 1em;
-  }
+.hud-panel .sub {
+  margin-top: 3px;
+  font-size: 12px;
+  min-height: 1em;
+}
 
   #beatToggle {
     top: 12px;
@@ -464,7 +467,11 @@
 <div id="gameWrapper">
   <canvas id="game"></canvas>
 
-  <button id="beatToggle" class="hud-panel on" aria-label="拍動切り替え"></button>
+  <button id="beatToggle" class="hud-panel on">
+    <span class="label">BEAT</span>
+    <span class="value">ON</span>
+    <span class="sub"></span>
+  </button>
 
   <div id="hudScore" class="hud-panel" aria-live="polite">
     <span class="label">SCORE</span>
@@ -776,6 +783,7 @@ function spawnBlock(playAudio = true) {
     x: 200,
     y: 80,
     baseY: 80,
+    maxY: 80,   // ← 追加
     size: 80,
     angleIndex: ai,
     speed: 0.25,
@@ -810,7 +818,6 @@ function nextBlockType(playAudio = true) {
 
   lastType = type;
   block.type = type;
-  block.baseY = block.y;
   block.state = "idle";
   block.hitFrame = 0;
   block.glow = 0;
@@ -1146,7 +1153,8 @@ function processHit(diagnostic, isCorrect) {
   diagnostic.state = isCorrect ? "fused" : "shatter";
   if (isCorrect) {
     diagnostic.x = block.x;
-    diagnostic.y = block.y + block.size * 0.18;
+    diagnostic.y = block.y + block.size * 0.25;
+    block.y = Math.max(block.maxY, block.y - 20);
     block.state = "success";
     block.hitFrame = 0;
     block.fuseX = diagnostic.x;
