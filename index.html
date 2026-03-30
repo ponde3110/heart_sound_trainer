@@ -61,9 +61,6 @@
   backdrop-filter: none;
 
   color: #fff;
-
-  display: flex;            /* ← 追加 */
-  flex-direction: column;   /* ← 追加 */
 }
 
 /* 共通 */
@@ -476,7 +473,6 @@
   <div id="hudScore" class="hud-panel" aria-live="polite">
     <span class="label">SCORE</span>
     <span class="value" id="scoreValue">0</span>
-    <span class="sub" id="scoreRank"></span>
   </div>
 
 <div id="startOverlay">
@@ -667,14 +663,13 @@ function updateLevel() {
 
 function updateScoreHUD() {
   scoreValue.textContent = String(score);
-  scoreRank.textContent = levelText || "";
 }
 
 function updateBeatBtn() {
   beatBtn.classList.toggle("on", beatEnabled);
   beatBtn.classList.toggle("off", !beatEnabled);
   beatBtn.innerHTML = `
-    <span class="label">Sync with BGM</span>
+    <span class="label">Sync to sound</span>
     <span class="value">${beatEnabled ? "心拍動あり" : "心拍動なし"}</span>
     <span class="sub">${beatEnabled ? "Heartbeat Active" : "Heartbeat Inactive"}</span>
   `;
@@ -696,7 +691,7 @@ function showStartOverlay(mode = "start") {
     startHeading.textContent = score >= 50 ? "🏆マイスター認定🏆" : "ゲームオーバー";
     startSub.textContent = "";
     overlayScore.style.display = "block";
-    overlayScore.textContent = `スコア ${score}${levelText ? ` / ${levelText}` : ""}`;
+    overlayScore.textContent = `格付け：${levelText}`;
     controlGuide.style.display = "none";
     startBtn.textContent = "RETRY";
   }
@@ -783,7 +778,7 @@ function spawnBlock(playAudio = true) {
     x: 200,
     y: 80,
     baseY: 80,
-    maxY: 80,   // ← 追加
+    maxY: 80,
     size: 80,
     angleIndex: ai,
     speed: 0.25,
@@ -910,7 +905,7 @@ canvas.addEventListener("touchmove", e => {
   if (touchStartX === null || !gameStarted || gameOver) return;
   const dx = e.touches[0].clientX - touchStartX;
   if (Math.abs(dx) > 30) {
-    dx < 0 ? rotateLeft() : rotateRight();
+    dx < 0 ? rotateRight() : rotateLeft(); // ← ここだけ逆に
     touchStartX = e.touches[0].clientX;
     touchMoved = true;
   }
@@ -1154,7 +1149,7 @@ function processHit(diagnostic, isCorrect) {
   if (isCorrect) {
     diagnostic.x = block.x;
     diagnostic.y = block.y + block.size * 0.25;
-    block.y = Math.max(block.maxY, block.y - 20);
+    block.y = Math.max(block.baseY, block.y - 20);
     block.state = "success";
     block.hitFrame = 0;
     block.fuseX = diagnostic.x;
@@ -1547,7 +1542,7 @@ function updateBlock() {
     return;
   }
 
-  block.speed = 0.25 + score * 0.03;
+  block.speed = 0.20 + score * 0.02;
   block.y += block.speed;
 
   const heartBottom = block.y + block.size / 2;
