@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Heart Sound Training</title>
+<title>心音マイスターへ Heart Sound Trainer</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
 
@@ -18,15 +19,14 @@
   }
 
   body {
-    background:
-      radial-gradient(circle at top, #12244b 0%, #050912 38%, #000 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100dvh;
-    overflow: hidden;
-    font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
-  }
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  overflow: hidden;
+  font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
 
   #gameWrapper {
     position: relative;
@@ -49,17 +49,25 @@
   }
 
   .hud-panel {
-    position: absolute;
-    z-index: 15;
-    min-width: 140px;
-    padding: 10px 14px;
-    border-radius: 16px;
-    background: rgba(10, 12, 22, 0.72);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: #fff;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 14px 34px rgba(0,0,0,0.32);
-  }
+  position: absolute;
+  z-index: 15;
+  min-width: 140px;
+  padding: 0;
+  border-radius: 0;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+
+  color: #fff;
+}
+
+.hud-panel .label,
+.hud-panel .value,
+.hud-panel .sub {
+  text-shadow: 0 0 8px rgba(0,0,0,0.8);
+}
 
   .hud-panel .label {
     display: block;
@@ -180,7 +188,8 @@
     border-radius: 18px;
     background: linear-gradient(180deg, rgba(124,247,255,0.24), rgba(93,139,255,0.18));
     color: white;
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bolder;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
@@ -205,7 +214,7 @@
     justify-content: center;
     padding: 24px;
     background:
-      radial-gradient(circle at center, rgba(7, 16, 38, 0.18), rgba(0,0,0,0.60));
+    radial-gradient(circle at center, rgba(7, 16, 38, 0.08), rgba(0,0,0,0.42));
     transition: opacity 0.35s ease, visibility 0.35s ease;
   }
 
@@ -216,19 +225,20 @@
   }
 
   .start-panel {
-    width: min(92vw, 420px);
-    padding: 26px 24px 24px;
-    border-radius: 28px;
-    color: #fff;
-    text-align: center;
-    background: var(--panel-bg);
-    border: 1px solid var(--panel-border);
-    box-shadow:
-      0 18px 60px rgba(0,0,0,0.42),
-      inset 0 1px 0 rgba(255,255,255,0.12),
-      0 0 60px rgba(93,139,255,0.10);
-    backdrop-filter: blur(14px);
-  }
+  width: min(92vw, 420px);
+  padding: 26px 24px 24px;
+  border-radius: 28px;
+  color: #fff;
+  text-align: center;
+
+  background: rgba(10, 18, 36, 0.42);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+
+  box-shadow:
+    0 18px 60px rgba(0,0,0,0.32),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
 
   .start-badge {
     display: inline-flex;
@@ -246,12 +256,10 @@
   }
 
   #startHeading {
-    font-size: clamp(28px, 5.8vw, 38px);
-    line-height: 1.1;
-    font-weight: 900;
-    letter-spacing: 0.03em;
-    text-shadow: 0 0 26px rgba(93,139,255,0.18);
-  }
+  font-size: clamp(22px, 4.8vw, 30px);
+  line-height: 1.15;
+  font-weight: 800;
+}
 
   #startSub {
     margin-top: 12px;
@@ -269,13 +277,29 @@
   }
 
   #controlGuide {
-    margin-top: 18px;
-    padding: 18px 16px;
-    border-radius: 18px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    text-align: center;
-  }
+  margin: 18px auto 0 auto;
+  width: fit-content;
+  max-width: 90%;
+
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+　.guide-list {
+  margin: 0 auto;
+  padding-left: 0.8em;
+  text-align: left;
+  line-height: 1.9;
+  font-size: 14px;
+  width: fit-content;
+}
+
+.guide-list li {
+  margin: 4px 0;
+}
 
   #controlGuide h2 {
     font-size: 13px;
@@ -285,15 +309,28 @@
   }
 
   .guide-row {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 14px;
-  }
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 14px;
+  width: 100%;
+}
+
+.guide-key {
+  text-align: left;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.guide-value {
+  text-align: right;
+  color: rgba(255,255,255,0.76);
+  flex: 1;
+}
 
   .guide-row:last-child { border-bottom: none; }
 
@@ -305,13 +342,6 @@
   .guide-value {
     color: rgba(255,255,255,0.76);
     text-align: center;
-  }
-
-  .preview-note {
-    margin-top: 14px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.52);
-    letter-spacing: 0.08em;
   }
 
   .overlay-footer {
@@ -336,7 +366,7 @@
     font-size: 8px;
     line-height: 1.5;
     color: rgba(255,255,255,0.52);
-    text-align: center;
+    text-align: left;
     z-index: 21;
   }
 
@@ -395,6 +425,39 @@
       line-height: 1.45;
     }
   }
+  #overlayHeart {
+  width: 90px;
+  display: block;
+  margin: 0 auto 14px auto;
+}
+
+#overlaySteth {
+  width: 70px;
+  display: block;
+  margin: 16px auto 12px auto;
+  opacity: 0.95;
+}
+#overlayHeartBg {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  opacity: 0.45;
+  z-index: 19;
+  pointer-events: none;
+}
+
+#overlayStethBg {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  opacity: 0.35;
+  z-index: 19;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -409,36 +472,24 @@
     <span class="sub" id="scoreRank"></span>
   </div>
 
-  <div id="startOverlay">
-    <div class="start-panel">
-      <div class="start-badge">HEART SOUND TRAINING</div>
-      <h1 id="startHeading">心音を正しく診断</h1>
-      <p id="startSub"></p>
-      <div id="overlayScore"></div>
+<div id="startOverlay">
 
-      <div id="controlGuide">
-        <h2>遊び方</h2>
-        <div class="guide-row">
-          <span class="guide-key">目的</span>
-          <span class="guide-value">正しい所見を下に合わせて診断</span>
-        </div>
-        <div class="guide-row">
-          <span class="guide-key" id="rotateGuideKey">← →</span>
-          <span class="guide-value" id="rotateGuideValue">回転</span>
-        </div>
-        <div class="guide-row">
-          <span class="guide-key" id="fireGuideKey">スペース</span>
-          <span class="guide-value" id="fireGuideValue">診断</span>
-        </div>
-      </div>
+  <div class="start-panel">
+    <div class="start-badge">HEART SOUND TRAINER</div>
+    <h1 id="startHeading">心音マイスターへ</h1>
+    <p id="startSub"></p>
+    <div id="overlayScore"></div>
 
-      <div class="preview-note"></div>
-      <button id="startBtn">START</button>
-      <div class="overlay-footer">
-        <div class="overlay-copyright">©2026 ponde3110</div>
-      </div>
+    <div id="controlGuide"></div>
+
+    <button id="startBtn">START</button>
+
+    <div class="overlay-footer">
+      <div class="overlay-copyright">©2026 ponde3110</div>
     </div>
-    <div class="overlay-disclaimer">本アプリに掲載する内容については，正確性および最新性の確保に細心の注意を払っておりますが，その完全性を保証するものではありません．身体所見の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害についても，当方は一切の責任を負いかねます．なお，掲載内容は予告なく追加，変更，または削除される場合があります．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
+  </div>
+
+  <div class="overlay-disclaimer">身体所見の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害について一切の責任を負いかねます．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
   </div>
 
   <div id="controls">
@@ -484,6 +535,9 @@ const bgm = new Audio("S4.mp3");
 bgm.loop = true;
 bgm.volume = 0.8;
 
+// ゲームオーバー時の爆発音
+let audioCtx = null;
+
 const BLOCK_TYPES = [
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅳ音 (S4)", sound:"S4.mp3" },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅲ音 (S3)", sound:"S3.mp3" },
@@ -525,28 +579,46 @@ let lastType = null;
 let levelText = "";
 let gameStarted = false;
 let dangerLinePhase = 0;
+let fadeOutTimer = null;
+
+// 音声の現在時刻を取得するためのAudioContext
+let audioContext = null;
+let audioStartTime = 0;
+
+function getAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioContext;
+}
 
 function updateControlsGuide() {
-  if (isMobile) {
-    rotateGuideKey.textContent = "スワイプ or ◀ ▶";
-    rotateGuideValue.textContent = "回転";
-    fireGuideKey.textContent = "聴診器 or 中央ボタン";
-    fireGuideValue.textContent = "診断";
-  } else {
-    rotateGuideKey.textContent = "← →";
-    rotateGuideValue.textContent = "回転";
-    fireGuideKey.textContent = "スペース";
-    fireGuideValue.textContent = "診断";
-  }
+  const items = isMobile
+    ? [
+        "背景にながれている心音を診断",
+        "選択肢を回転・スワイプで変更",
+        "中央ボタンで診断ミサイル発射"
+      ]
+    : [
+        "背景に流れている心音を診断",
+        "選択肢を左右矢印キーで変更",
+        "スペースで診断ミサイル発射"
+      ];
+
+  controlGuide.innerHTML = `
+    <ul class="guide-list">
+      ${items.map(item => `<li>${item}</li>`).join("")}
+    </ul>
+  `;
 }
 
 function resetStar(star, initial = false) {
-  star.x = (Math.random() - 0.5) * canvas.width * 1.6;
-  star.y = (Math.random() - 0.5) * canvas.height * 1.6;
-  star.z = initial ? Math.random() * STAR_DEPTH + 1 : STAR_DEPTH;
-  star.size = 0.3 + Math.random() * 1.6;
-  star.alpha = 0.16 + Math.random() * 0.34;
-  star.hue = 190 + Math.random() * 50;
+  star.x = Math.random() * canvas.width;
+  star.y = initial ? Math.random() * canvas.height : -10;
+  star.z = Math.random() * STAR_DEPTH + 1;
+  star.baseSize = 0.3 + Math.random() * 0.8;
+  star.speed = 0.02 + (STAR_DEPTH - star.z) * 0.03;
+  star.alpha = 0.2 + (STAR_DEPTH - star.z) * 0.03;
 }
 
 function initStars() {
@@ -556,8 +628,10 @@ function initStars() {
 
 function updateStars() {
   for (const star of stars) {
-    star.z -= 0.055 + score * 0.0008;
-    if (star.z <= 0.35) resetStar(star, false);
+    star.y += star.speed + score * 0.002;
+    if (star.y > canvas.height + 10) {
+      resetStar(star, false);
+    }
   }
 }
 
@@ -569,44 +643,10 @@ function drawSpaceBackground() {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const nebulaA = ctx.createRadialGradient(canvas.width * 0.22, canvas.height * 0.18, 8, canvas.width * 0.22, canvas.height * 0.18, canvas.width * 0.62);
-  nebulaA.addColorStop(0, 'rgba(110,160,255,0.12)');
-  nebulaA.addColorStop(1, 'rgba(110,160,255,0)');
-  ctx.fillStyle = nebulaA;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const nebulaB = ctx.createRadialGradient(canvas.width * 0.74, canvas.height * 0.28, 12, canvas.width * 0.74, canvas.height * 0.28, canvas.width * 0.56);
-  nebulaB.addColorStop(0, 'rgba(120,255,245,0.07)');
-  nebulaB.addColorStop(1, 'rgba(120,255,245,0)');
-  ctx.fillStyle = nebulaB;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
   for (const star of stars) {
-    const depth = 1 / star.z;
-    const sx = cx + star.x * depth;
-    const sy = cy + star.y * depth;
-    if (sx < -24 || sx > canvas.width + 24 || sy < -24 || sy > canvas.height + 24) {
-      resetStar(star, false);
-      continue;
-    }
-
-    const streak = 4 + (STAR_DEPTH - star.z) * 0.45;
-    const radius = star.size + (STAR_DEPTH - star.z) * 0.016;
-    const twinkle = 0.78 + Math.sin(beatTick * 0.018 + star.x) * 0.08;
-    const alpha = Math.min(0.38, star.alpha * (0.75 + depth * 3.4) * twinkle);
-
-    ctx.strokeStyle = `hsla(${star.hue}, 90%, 82%, ${alpha * 0.55})`;
-    ctx.lineWidth = Math.max(0.45, radius * 0.68);
+    ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
     ctx.beginPath();
-    ctx.moveTo(sx, sy);
-    ctx.lineTo(sx, sy + streak);
-    ctx.stroke();
-
-    ctx.fillStyle = `hsla(${star.hue}, 95%, 88%, ${alpha})`;
-    ctx.beginPath();
-    ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+    ctx.arc(star.x, star.y, star.baseSize, 0, Math.PI * 2);
     ctx.fill();
   }
 }
@@ -627,9 +667,9 @@ function updateBeatBtn() {
   beatBtn.classList.toggle("on", beatEnabled);
   beatBtn.classList.toggle("off", !beatEnabled);
   beatBtn.innerHTML = `
-    <span class="label">BEAT MODE</span>
-    <span class="value">${beatEnabled ? "拍動あり" : "拍動なし"}</span>
-    <span class="sub">${beatEnabled ? "Heartbeat Active" : "Heartbeat Off"}</span>
+    <span class="label">Sync with BGM</span>
+    <span class="value">${beatEnabled ? "心拍動あり" : "心拍動なし"}</span>
+    <span class="sub">${beatEnabled ? "Heartbeat Active" : "Heartbeat Inactive"}</span>
   `;
 }
 
@@ -640,14 +680,14 @@ function updateControlButtons() {
 function showStartOverlay(mode = "start") {
   startOverlay.classList.remove("hidden");
   if (mode === "start") {
-    startHeading.textContent = "心音を正しく診断";
+    startHeading.textContent = "心音マイスターへ";
     startSub.textContent = "";
     overlayScore.style.display = "none";
     controlGuide.style.display = "block";
     startBtn.textContent = "START";
   } else {
-    startHeading.textContent = score >= 50 ? "マイスター認定！" : "ゲームオーバー";
-    startSub.textContent = "スコアを更新できるよう、もう一度チャレンジ！";
+    startHeading.textContent = score >= 50 ? "🏆マイスター認定🏆" : "ゲームオーバー";
+    startSub.textContent = "";
     overlayScore.style.display = "block";
     overlayScore.textContent = `スコア ${score}${levelText ? ` / ${levelText}` : ""}`;
     controlGuide.style.display = "none";
@@ -674,10 +714,48 @@ function resetGameState() {
 
 function startGame() {
   resetGameState();
+
+  bgm.pause();
+  bgm.currentTime = 0;
+  bgm.volume = 0.8;
+
   gameStarted = true;
   hideStartOverlay();
   updateControlButtons();
+
   spawnBlock(true);
+}
+
+function playGameOverSound() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(
+    80,
+    audioCtx.currentTime + 1.2
+  );
+
+  gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    audioCtx.currentTime + 1.2
+  );
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 1.2);
 }
 
 startBtn.addEventListener("click", startGame);
@@ -706,7 +784,12 @@ function spawnBlock(playAudio = true) {
     hitFrame: 0,
     fuseX: 0,
     fuseY: 0,
-    glow: 0
+    glow: 0,
+    // ゲームオーバーアニメーション用
+    dyingFrame: 0,
+    dyingMaxFrames: 120,
+    dyingScale: 1,
+    dyingAlpha: 1
   };
   labelAngle = labelAngleTo = ai * Math.PI / 2;
 
@@ -727,11 +810,13 @@ function nextBlockType(playAudio = true) {
 
   lastType = type;
   block.type = type;
-  block.baseY = 80;
-  block.y = 80;
+  block.baseY = block.y;
   block.state = "idle";
   block.hitFrame = 0;
   block.glow = 0;
+  block.dyingFrame = 0;
+  block.dyingScale = 1;
+  block.dyingAlpha = 1;
 
   const ni = Math.floor(Math.random() * 4);
   block.angleIndex = ni;
@@ -744,8 +829,15 @@ function nextBlockType(playAudio = true) {
 function endGame() {
   gameOver = true;
   gameStarted = false;
+
   bgm.pause();
   bgm.currentTime = 0;
+  bgm.volume = 0.8;
+
+  playGameOverSound();
+
+  spawnBlock(false);
+
   updateControlButtons();
   showStartOverlay("retry");
 }
@@ -765,6 +857,7 @@ function spawnDiagnostic() {
 
 function fireAction() {
   if (!gameStarted || gameOver || !block) return;
+  if (block.state === "dying") return;
   if (player.shootAnim || diagnostics.some(d => d.state === "flying" || d.state === "launch")) return;
   if (bgm.paused) bgm.play().catch(() => {});
   player.shootAnim = { phase: "compress", frame: 0 };
@@ -772,12 +865,14 @@ function fireAction() {
 
 function rotateLeft() {
   if (!gameStarted || gameOver || !block) return;
+  if (block.state === "dying") return;
   block.angleIndex = (block.angleIndex + 3) % 4;
   labelAngleTo -= Math.PI / 2;
 }
 
 function rotateRight() {
   if (!gameStarted || gameOver || !block) return;
+  if (block.state === "dying") return;
   block.angleIndex = (block.angleIndex + 1) % 4;
   labelAngleTo += Math.PI / 2;
 }
@@ -831,23 +926,151 @@ addPress(document.getElementById("leftBtn"), rotateLeft);
 addPress(document.getElementById("rightBtn"), rotateRight);
 addPress(document.getElementById("fireBtn"), fireAction);
 
+// 拡張されたBEAT_PATTERNS - 各音源に対応
+// beats: 1心拍サイクル内の拍動タイミング（0〜1の比率）
+// bpm: 音源のBPM（心拍数）
+// strength: 各拍動の強さ
+// duration: 拍動の持続時間（秒）
 const BEAT_PATTERNS = {
-  "S4.mp3": { beats:[0], bpm:70, strength:[1.0] },
-  "S3.mp3": { beats:[0,0.55], bpm:70, strength:[1.0,0.45] },
-  "gallop.mp3": { beats:[0,0.35,0.6], bpm:100, strength:[1.0,0.6,0.5] }
+  // 正常心音 - S1とS2
+  "normal.mp3": { 
+    beats: [0, 0.35], 
+    bpm: 72, 
+    strength: [1.0, 0.7],
+    duration: [0.08, 0.06]
+  },
+  // S4 - S1の直前に追加音
+  "S4.mp3": { 
+    beats: [0, 0.12, 0.45], 
+    bpm: 68, 
+    strength: [0.5, 1.0, 0.6],
+    duration: [0.05, 0.08, 0.06]
+  },
+  // S3 - S2の直後に追加音
+  "S3.mp3": { 
+    beats: [0, 0.35, 0.48], 
+    bpm: 70, 
+    strength: [1.0, 0.7, 0.45],
+    duration: [0.08, 0.06, 0.05]
+  },
+  // ギャロップ - S3+S4の組み合わせ
+  "gallop.mp3": { 
+    beats: [0, 0.12, 0.38, 0.52], 
+    bpm: 95, 
+    strength: [0.5, 1.0, 0.65, 0.4],
+    duration: [0.04, 0.07, 0.05, 0.04]
+  },
+  // クリック - 収縮中期のクリック音
+  "click.mp3": { 
+    beats: [0, 0.22, 0.42], 
+    bpm: 75, 
+    strength: [1.0, 0.6, 0.7],
+    duration: [0.08, 0.03, 0.06]
+  },
+  // 駆出音 - S1直後の駆出音
+  "ej.mp3": { 
+    beats: [0, 0.08, 0.4], 
+    bpm: 72, 
+    strength: [1.0, 0.55, 0.7],
+    duration: [0.08, 0.04, 0.06]
+  },
+  // Ⅱ音肺動脈成分亢進
+  "2P.mp3": { 
+    beats: [0, 0.36, 0.42], 
+    bpm: 74, 
+    strength: [1.0, 0.6, 0.85],
+    duration: [0.08, 0.05, 0.06]
+  },
+  // 収縮期駆出性雑音 - crescendo-decrescendo
+  "SEM.mp3": { 
+    beats: [0, 0.42], 
+    bpm: 70, 
+    strength: [1.0, 0.7],
+    duration: [0.12, 0.06]
+  },
+  // 全収縮期逆流性雑音
+  "HSM.mp3": { 
+    beats: [0, 0.4], 
+    bpm: 72, 
+    strength: [1.0, 0.75],
+    duration: [0.15, 0.06]
+  },
+  // 往復雑音
+  "TAF.mp3": { 
+    beats: [0, 0.35], 
+    bpm: 68, 
+    strength: [1.0, 0.85],
+    duration: [0.12, 0.1]
+  },
+  // 連続性雑音
+  "CM.mp3": { 
+    beats: [0, 0.25, 0.5, 0.75], 
+    bpm: 65, 
+    strength: [0.9, 0.7, 0.85, 0.65],
+    duration: [0.1, 0.08, 0.1, 0.08]
+  },
+  // 収縮後期雑音
+  "LSM.mp3": { 
+    beats: [0, 0.28, 0.42], 
+    bpm: 72, 
+    strength: [1.0, 0.6, 0.7],
+    duration: [0.08, 0.08, 0.06]
+  },
+  // 心膜摩擦音 - 3成分
+  "rub.mp3": { 
+    beats: [0, 0.2, 0.55], 
+    bpm: 75, 
+    strength: [1.0, 0.7, 0.6],
+    duration: [0.06, 0.05, 0.05]
+  },
+  // ランブル - 拡張期ランブル
+  "rumble.mp3": { 
+    beats: [0, 0.38], 
+    bpm: 68, 
+    strength: [1.0, 0.8],
+    duration: [0.08, 0.15]
+  }
+};
+
+// デフォルトパターン
+const DEFAULT_BEAT_PATTERN = { 
+  beats: [0, 0.4], 
+  bpm: 72, 
+  strength: [1.0, 0.7],
+  duration: [0.08, 0.06]
 };
 
 function getBeat() {
-  const p = BLOCK_TYPES && block ? (BEAT_PATTERNS[block.type.sound] || BEAT_PATTERNS["S4.mp3"]) : BEAT_PATTERNS["S4.mp3"];
-  const cycle = (60 / p.bpm) * 60;
-  const phase = (beatTick % cycle) / cycle;
+  if (!beatEnabled) return 0;
+  
+  const soundFile = block ? block.type.sound : "normal.mp3";
+  const p = BEAT_PATTERNS[soundFile] || DEFAULT_BEAT_PATTERN;
+  
+  // 音声の現在時刻を使用（より正確な同期）
+  const currentTime = bgm.currentTime;
+  const cycleDuration = 60 / p.bpm; // 1心拍の長さ（秒）
+  const phase = (currentTime % cycleDuration) / cycleDuration; // 0〜1の位相
+  
   let beat = 0;
   for (let i = 0; i < p.beats.length; i++) {
-    const d = phase - p.beats[i];
-    if (d >= 0 && d < 0.12) {
-      beat = Math.max(beat, p.strength[i] * Math.sin(d / 0.12 * Math.PI) * 0.22);
+    const beatTime = p.beats[i];
+    const dur = p.duration ? p.duration[i] : 0.08;
+    const durPhase = dur / cycleDuration; // 持続時間を位相に変換
+    
+    // 位相の差分を計算（ループを考慮）
+    let d = phase - beatTime;
+    if (d < -0.5) d += 1;
+    if (d > 0.5) d -= 1;
+    
+    // 拍動の範囲内かチェック
+    if (d >= 0 && d < durPhase) {
+      // スムーズな立ち上がりと減衰
+      const progress = d / durPhase;
+      const envelope = Math.sin(progress * Math.PI); // 0→1→0のスムーズな変化
+      beat = Math.max(beat, p.strength[i] * envelope * 0.25);
     }
   }
+  
   return beat;
 }
 
@@ -880,6 +1103,41 @@ function createSuccessBurst(x, y) {
       life: 28 + Math.random() * 12,
       maxLife: 40,
       size: 2 + Math.random() * 3
+    });
+  }
+}
+
+// 心臓が消える時のパーティクル
+function createDyingParticles(x, y) {
+  // 砕け散るパーティクル
+  for (let i = 0; i < 20; i++) {
+    const angle = (Math.PI * 2 * i) / 20 + Math.random() * 0.3;
+    const speed = 2 + Math.random() * 3;
+    particles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1,
+      life: 30 + Math.random() * 15,
+      maxLife: 45,
+      type: "dying",
+      size: 3 + Math.random() * 5,
+      color: Math.random() > 0.5 ? "rgba(255, 100, 120," : "rgba(255, 180, 200,"
+    });
+  }
+  
+  // 中心から広がるリング
+  for (let i = 0; i < 3; i++) {
+    particles.push({
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      life: 25 - i * 5,
+      maxLife: 25 - i * 5,
+      type: "ring",
+      size: 10 + i * 15,
+      delay: i * 5
     });
   }
 }
@@ -945,10 +1203,19 @@ function updateDiagnostics() {
 
 function updateParticles() {
   particles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.06;
-    p.life -= 1;
+    if (p.type === "ring") {
+      if (p.delay > 0) {
+        p.delay--;
+      } else {
+        p.size += 4;
+        p.life -= 1;
+      }
+    } else {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.06;
+      p.life -= 1;
+    }
   });
   particles = particles.filter(p => p.life > 0);
 
@@ -963,7 +1230,47 @@ function updateParticles() {
 
 function drawBlock() {
   if (!block || !heartImg.complete) return;
-  const beatScale = beatEnabled ? 1 + getBeat() : 1;
+  
+  // dying状態の場合は特別な描画
+  if (block.state === "dying") {
+    const progress = block.dyingFrame / block.dyingMaxFrames;
+    const scale = block.dyingScale;
+    const alpha = block.dyingAlpha;
+    
+    const beatScale = beatEnabled ? 1 + getBeat() * (1 - progress) : 1; // 拍動も徐々に弱まる
+    const size = block.size * beatScale * scale;
+    
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    
+    // 赤い警告グロー
+    const glowIntensity = 0.5 + Math.sin(block.dyingFrame * 0.4) * 0.3;
+    const glowR = size * (0.8 + progress * 0.5);
+    const glow = ctx.createRadialGradient(block.x, block.y, 5, block.x, block.y, glowR);
+    glow.addColorStop(0, `rgba(255, 80, 100, ${glowIntensity * alpha})`);
+    glow.addColorStop(0.5, `rgba(255, 50, 80, ${glowIntensity * 0.5 * alpha})`);
+    glow.addColorStop(1, "rgba(255, 50, 80, 0)");
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(block.x, block.y, glowR, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 心臓を描画（回転しながら縮小）
+    ctx.translate(block.x, block.y);
+    ctx.rotate(progress * Math.PI * 2); // 回転
+    ctx.drawImage(heartImg, -size / 2, -size / 2, size, size);
+    
+    ctx.restore();
+    return;
+  }
+  
+  let beatScale = 1;
+
+if (gameStarted) {
+  beatScale = beatEnabled ? 1 + getBeat() : 1;
+} else {
+  beatScale = 1 + Math.sin(Date.now() * 0.002) * 0.08;
+}
   const successBoost = block.state === "success" ? 1 + Math.sin(block.hitFrame * 0.35) * 0.05 : 1;
   const size = block.size * beatScale * successBoost;
 
@@ -996,6 +1303,8 @@ function drawBlock() {
 
 function drawLabels() {
   if (!block || !gameStarted || gameOver) return;
+  if (block.state === "dying") return; // dying状態ではラベルを表示しない
+  
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
@@ -1070,14 +1379,30 @@ function drawDiagnostics() {
 function drawParticles() {
   particles.forEach(p => {
     const alpha = Math.max(p.life / p.maxLife, 0);
-    ctx.fillStyle = `rgba(255, 160, 190, ${alpha})`;
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y - p.size);
-    ctx.lineTo(p.x + p.size, p.y);
-    ctx.lineTo(p.x, p.y + p.size);
-    ctx.lineTo(p.x - p.size, p.y);
-    ctx.closePath();
-    ctx.fill();
+    
+    if (p.type === "ring") {
+      if (p.delay <= 0) {
+        ctx.strokeStyle = `rgba(255, 100, 120, ${alpha * 0.6})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    } else if (p.type === "dying") {
+      ctx.fillStyle = p.color + alpha + ")";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = `rgba(255, 160, 190, ${alpha})`;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - p.size);
+      ctx.lineTo(p.x + p.size, p.y);
+      ctx.lineTo(p.x, p.y + p.size);
+      ctx.lineTo(p.x - p.size, p.y);
+      ctx.closePath();
+      ctx.fill();
+    }
   });
 
   successBursts.forEach(p => {
@@ -1091,7 +1416,13 @@ function drawParticles() {
 }
 
 function drawDangerLine() {
-  const grad = ctx.createLinearGradient(76, GAME_OVER_LINE_Y, canvas.width - 76, GAME_OVER_LINE_Y);
+  const grad = ctx.createLinearGradient(
+    76,
+    GAME_OVER_LINE_Y,
+    canvas.width - 76,
+    GAME_OVER_LINE_Y
+  );
+
   grad.addColorStop(0, 'rgba(255, 122, 159, 0.08)');
   grad.addColorStop(0.18, 'rgba(255, 210, 120, 0.92)');
   grad.addColorStop(0.5, 'rgba(124, 247, 255, 0.96)');
@@ -1099,45 +1430,65 @@ function drawDangerLine() {
   grad.addColorStop(1, 'rgba(255, 122, 159, 0.08)');
 
   ctx.save();
-  ctx.setLineDash([10, 8]);
-  ctx.lineDashOffset = -dangerLinePhase;
+
   ctx.strokeStyle = grad;
-  ctx.lineWidth = 2.4;
-  ctx.shadowColor = 'rgba(124, 247, 255, 0.35)';
+  ctx.lineWidth = 2.6;
+  ctx.shadowColor = 'rgba(124, 247, 255, 0.45)';
   ctx.shadowBlur = 12;
+
   ctx.beginPath();
-  ctx.moveTo(76, GAME_OVER_LINE_Y);
-  ctx.lineTo(canvas.width - 76, GAME_OVER_LINE_Y);
-  ctx.stroke();
 
-  ctx.setLineDash([]);
-  for (let x = 102; x <= canvas.width - 102; x += 48) {
-    const pulse = 0.72 + Math.sin((dangerLinePhase + x) * 0.08) * 0.16;
-    ctx.strokeStyle = `rgba(255, 220, 140, ${0.24 * pulse})`;
-    ctx.lineWidth = 1.1;
-    ctx.beginPath();
-    ctx.moveTo(x - 7, GAME_OVER_LINE_Y - 6);
-    ctx.lineTo(x, GAME_OVER_LINE_Y);
-    ctx.lineTo(x + 7, GAME_OVER_LINE_Y - 6);
-    ctx.stroke();
+  for (let x = 76; x <= canvas.width - 76; x += 4) {
+    const y =
+      GAME_OVER_LINE_Y +
+      Math.sin(x * 0.035 + dangerLinePhase * 0.08) * 5;
+
+    if (x === 76) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
   }
-  ctx.restore();
-}
 
+  ctx.stroke();
+}
 function drawHUD() {}
 
 function drawPlayer() {
   if (!stethImg.complete) return;
-  const idleFloat = Math.sin(beatTick * 0.055) * 3.6 + Math.sin(beatTick * 0.022 + 1.4) * 1.4;
+
+  const idleFloat =
+    Math.sin(beatTick * 0.055) * 3.6 +
+    Math.sin(beatTick * 0.022 + 1.4) * 1.4;
+
   const idleTilt = Math.sin(beatTick * 0.038) * 0.04;
-  const h = 80 * player.shootScale * (1 + Math.sin(beatTick * 0.05) * 0.012);
+
+  const h =
+    92 *
+    player.shootScale *
+    (1 + Math.sin(beatTick * 0.05) * 0.012);
+
   const w = stethImg.width * (h / stethImg.height);
-  const offsetY = (1 - player.shootScale) * 14 + idleFloat;
+
+  const offsetY =
+    (1 - player.shootScale) * 14 + idleFloat;
 
   ctx.save();
   ctx.translate(player.x, player.y + offsetY);
   ctx.rotate(idleTilt);
+
+  // 青いオーラ
+  ctx.shadowColor = "rgba(80,180,255,0.75)";
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
   ctx.drawImage(stethImg, -w / 2, -h / 2, w, h);
+
+  // 本体をもう一度描いて輪郭をくっきり
+  ctx.shadowBlur = 0;
+  ctx.drawImage(stethImg, -w / 2, -h / 2, w, h);
+
   ctx.restore();
 }
 
@@ -1151,23 +1502,32 @@ function draw() {
   drawDangerLine();
   drawPlayer();
   drawHUD();
-
-  if (gameOver) {
-    ctx.fillStyle = "rgba(0,0,0,0.46)";
-    ctx.fillRect(24, 205, canvas.width - 48, 142);
-    ctx.fillStyle = score >= 50 ? "#ffd76b" : "#ff6b8c";
-    ctx.font = "bold 34px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(score >= 50 ? "マイスター認定！" : "ゲームオーバー", 200, 257);
-    ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
-    const displayText = levelText ? `スコア: ${score}（${levelText}）` : `スコア: ${score}`;
-    ctx.fillText(displayText, 200, 305);
-  }
 }
 
 function updateBlock() {
   if (!block) return;
+
+  // dying状態の更新
+  if (block.state === "dying") {
+    block.dyingFrame++;
+    const progress = block.dyingFrame / block.dyingMaxFrames;
+    
+    // イージング関数でスムーズな縮小
+    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+    block.dyingScale = 1 - easeOutQuart * 0.9; // 最終的に10%まで縮小
+    block.dyingAlpha = 1 - easeOutQuart; // 透明に
+    
+    // 途中でパーティクルを追加
+    if (block.dyingFrame === 15) {
+      createDyingParticles(block.x, block.y);
+    }
+    
+    // アニメーション完了でゲームオーバー
+    if (block.dyingFrame >= block.dyingMaxFrames) {
+      endGame();
+    }
+    return;
+  }
 
   if (block.state === "success") {
     block.hitFrame++;
@@ -1184,12 +1544,29 @@ function updateBlock() {
 
   const heartBottom = block.y + block.size / 2;
   if (heartBottom >= GAME_OVER_LINE_Y) {
-    endGame();
+    // 即座にゲームオーバーではなく、dying状態に移行
+    block.state = "dying";
+    block.dyingFrame = 0;
+    block.dyingScale = 1;
+    block.dyingAlpha = 1;
+    
+    // BGMをフェードアウト
+    if (fadeOutTimer) clearInterval(fadeOutTimer);
+    fadeOutTimer = setInterval(() => {
+      if (bgm.volume > 0.1) {
+        bgm.volume -= 0.1;
+      } else {
+        bgm.volume = 0;
+        bgm.pause();
+        clearInterval(fadeOutTimer);
+        fadeOutTimer = null;
+      }
+    }, 50);
   }
 }
 
 function checkDiagnosticHits() {
-  if (!block || block.state === "success") return;
+  if (!block || block.state === "success" || block.state === "dying") return;
 
   for (let i = diagnostics.length - 1; i >= 0; i--) {
     const d = diagnostics[i];
@@ -1233,7 +1610,7 @@ function update() {
 
 function loop() {
   beatTick++;
-  dangerLinePhase += 0.55;
+  dangerLinePhase += 0.15;
   labelAngle += (labelAngleTo - labelAngle) * (gameStarted ? 0.18 : 0.08);
 
   if (gameStarted && !gameOver) {
