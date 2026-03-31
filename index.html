@@ -559,9 +559,18 @@ const BLOCK_TYPES = [
 ];
 
 const heartImg = new Image();
-heartImg.src = "heart.png";
 const stethImg = new Image();
+let heartLoaded = false;
+let stethLoaded = false;
+heartImg.onload = () => { heartLoaded = true; };
+stethImg.onload = () => { stethLoaded = true; };
+heartImg.onerror = () => { heartLoaded = false; };
+stethImg.onerror = () => { stethLoaded = false; };
+heartImg.src = "heart.png";
 stethImg.src = "stethoscope.png";
+// iOSキャッシュ対応：すでにロード済みの場合もフラグを立てる
+if (heartImg.complete && heartImg.naturalWidth > 0) heartLoaded = true;
+if (stethImg.complete && stethImg.naturalWidth > 0) stethLoaded = true;
 
 let score = 0;
 let block;
@@ -676,7 +685,14 @@ function updateBeatBtn() {
 }
 
 function updateControlButtons() {
-  controls.style.display = isMobile && gameStarted ? "flex" : "none";
+  const show = isMobile && gameStarted;
+  controls.style.display = show ? "flex" : "none";
+  if (show) {
+    // 強制リフローでiOSの描画を確実にトリガー
+    void controls.offsetHeight;
+    controls.style.opacity = "0.99";
+    requestAnimationFrame(() => { controls.style.opacity = "1"; });
+  }
 }
 
 function showStartOverlay(mode = "start") {
@@ -723,7 +739,13 @@ function startGame() {
 
   gameStarted = true;
   hideStartOverlay();
-  updateControlButtons();
+  resizeCanvas();
+  // iOS Safari のレイアウト再計算が完了してからボタンを表示する
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      updateControlButtons();
+    });
+  });
 
   spawnBlock(true);
 }
@@ -765,6 +787,12 @@ beatBtn.addEventListener("click", () => {
   beatEnabled = !beatEnabled;
   updateBeatBtn();
 });
+// スタート画面・ゲームオーバー画面でもタッチで切り替えられるよう追加
+beatBtn.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  beatEnabled = !beatEnabled;
+  updateBeatBtn();
+}, { passive: false });
 
 function spawnBlock(playAudio = true) {
   let type;
@@ -1232,7 +1260,7 @@ function updateParticles() {
 }
 
 function drawBlock() {
-  if (!block || !heartImg.complete) return;
+  if (!block || !heartLoaded) return;
   
   // dying状態の場合は特別な描画
   if (block.state === "dying") {
@@ -1272,7 +1300,7 @@ function drawBlock() {
 if (gameStarted) {
   beatScale = beatEnabled ? 1 + getBeat() : 1;
 } else {
-  beatScale = 1 + Math.sin(Date.now() * 0.002) * 0.08;
+  beatScale = beatEnabled ? 1 + Math.sin(Date.now() * 0.002) * 0.08 : 1;
 }
   const successBoost = block.state === "success" ? 1 + Math.sin(block.hitFrame * 0.35) * 0.05 : 1;
   const size = block.size * beatScale * successBoost;
@@ -1458,7 +1486,7 @@ function drawDangerLine() {
 function drawHUD() {}
 
 function drawPlayer() {
-  if (!stethImg.complete) return;
+  if (!stethLoaded) return;
 
   const idleFloat =
     Math.sin(beatTick * 0.055) * 3.6 +
@@ -1534,8 +1562,10 @@ function updateBlock() {
 
   if (block.state === "success") {
     block.hitFrame++;
-    block.y -= 3.8;
-    block.fuseY -= 3.8;
+    if (block.y - 3.8 >= block.baseY) {
+      block.y -= 3.8;
+      block.fuseY -= 3.8;
+    }
     if (block.hitFrame > 24) {
       nextBlockType(true);
     }
