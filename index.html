@@ -48,6 +48,10 @@
       0 0 60px rgba(0,160,255,0.08);
   }
 
+  button:focus {
+  outline: none;
+}
+
   .hud-panel {
   position: absolute;
   z-index: 15;
@@ -492,7 +496,7 @@
     </div>
   </div>
 
-  <div class="overlay-disclaimer">身体所見の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害について一切の責任を負いかねます．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
+  <div class="overlay-disclaimer">心音の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害について一切の責任を負いかねます．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
   </div>
 
   <div id="controls">
@@ -541,36 +545,55 @@ bgm.volume = 0.8;
 // ゲームオーバー時の爆発音
 let audioCtx = null;
 
+// difficulty: 1=初級, 2=中級, 3=上級
 const BLOCK_TYPES = [
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅳ音 (S4)", sound:"S4.mp3" },
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅲ音 (S3)", sound:"S3.mp3" },
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"正常", sound:"normal.mp3" },
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"ギャロップ", sound:"gallop.mp3" },
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","クリック"], correct:"クリック", sound:"click.mp3" },
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","駆出音"], correct:"駆出音", sound:"ej.mp3" },
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","Ⅱ音肺動脈成分の亢進"], correct:"Ⅱ音肺動脈成分の亢進", sound:"2P.mp3" },
-  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"収縮期駆出性", sound:"SEM.mp3" },
-  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"全収縮期逆流性", sound:"HSM.mp3" },
-  { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"], correct:"往復雑音", sound:"TAF.mp3" },
-  { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"], correct:"連続性雑音", sound:"CM.mp3" },
-  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"収縮後期", sound:"LSM.mp3" },
-  { labels:["ランブル","心膜摩擦音","連続性雑音","ギャロップ"], correct:"心膜摩擦音", sound:"rub.mp3" },
-  { labels:["ランブル","心膜摩擦音","連続性雑音","ギャロップ"], correct:"ランブル", sound:"rumble.mp3" }
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"正常",    sound:"normal.mp3", difficulty:1 },
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅳ音 (S4)", sound:"S4.mp3",     difficulty:1 },
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅲ音 (S3)", sound:"S3.mp3",     difficulty:1 },
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"ギャロップ", sound:"gallop.mp3", difficulty:1 },
+  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"収縮期駆出性",   sound:"SEM.mp3",    difficulty:1 },
+  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"全収縮期逆流性", sound:"HSM.mp3",    difficulty:1},
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","クリック"],  correct:"クリック",  sound:"click.mp3",  difficulty:2 },
+  { labels:["ランブル","心膜摩擦音","連続性雑音","ギャロップ"],     correct:"心膜摩擦音",     sound:"rub.mp3",    difficulty:2 },
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","Ⅱ音肺動脈成分の亢進"], correct:"Ⅱ音肺動脈成分の亢進", sound:"2P.mp3", difficulty:2 },
+  { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"],     correct:"往復雑音",       sound:"TAF.mp3",    difficulty:2 },
+  { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"],     correct:"連続性雑音",     sound:"CM.mp3",     difficulty:3 },
+  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"収縮後期",       sound:"LSM.mp3",    difficulty:3 },
+  { labels:["ランブル","心膜摩擦音","連続性雑音","ギャロップ"],     correct:"ランブル",       sound:"rumble.mp3", difficulty:3 },
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","駆出音"], correct:"駆出音",   sound:"ej.mp3",     difficulty:3 },
+  { labels:["正常（心基部）","正常（心尖部）","Ⅱ音肺動脈成分の亢進","ギャロップ"],     correct:"正常（心尖部）",       sound:"apex.mp3", difficulty:3 },
+  { labels:["正常（心基部）","正常（心尖部）","Ⅱ音肺動脈成分の亢進","ギャロップ"],     correct:"正常（心基部）",       sound:"base.mp3", difficulty:3 }
 ];
 
+// 現在の難易度に応じて出題する問題をフィルタ
+function getAllowedTypes() {
+  if (score >= 25) return BLOCK_TYPES; // 上級：全問
+  if (score >= 10) return BLOCK_TYPES.filter(t => t.difficulty <= 2); // 中級：初級＋中級
+  return BLOCK_TYPES.filter(t => t.difficulty === 1); // 初級のみ
+}
+
 const heartImg = new Image();
+const heartMaisterImg = new Image();
 const stethImg = new Image();
 let heartLoaded = false;
+let heartMaisterLoaded = false;
 let stethLoaded = false;
 heartImg.onload = () => { heartLoaded = true; };
+heartMaisterImg.onload = () => { heartMaisterLoaded = true; };
 stethImg.onload = () => { stethLoaded = true; };
 heartImg.onerror = () => { heartLoaded = false; };
+heartMaisterImg.onerror = () => { heartMaisterLoaded = false; };
 stethImg.onerror = () => { stethLoaded = false; };
 heartImg.src = "heart.png";
+heartMaisterImg.src = "heart_maister.png";
 stethImg.src = "stethoscope.png";
 // iOSキャッシュ対応：すでにロード済みの場合もフラグを立てる
 if (heartImg.complete && heartImg.naturalWidth > 0) heartLoaded = true;
+if (heartMaisterImg.complete && heartMaisterImg.naturalWidth > 0) heartMaisterLoaded = true;
 if (stethImg.complete && stethImg.naturalWidth > 0) stethLoaded = true;
+
+// マイスター達成フラグ（一度達成したらtrue固定）
+let isMaister = false;
 
 let score = 0;
 let block;
@@ -787,6 +810,50 @@ beatBtn.addEventListener("click", () => {
   beatEnabled = !beatEnabled;
   updateBeatBtn();
 });
+
+// 爆発効果音（ゲームオーバー時・dying開始時）
+function playExplosionSound() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
+
+  const now = audioCtx.currentTime;
+
+  // ノイズバースト（爆発感）
+  const bufferSize = audioCtx.sampleRate * 0.6;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+  }
+  const noiseSource = audioCtx.createBufferSource();
+  noiseSource.buffer = buffer;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(0.55, now);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(600, now);
+  filter.frequency.exponentialRampToValueAtTime(80, now + 0.5);
+  noiseSource.connect(filter);
+  filter.connect(noiseGain);
+  noiseGain.connect(audioCtx.destination);
+  noiseSource.start(now);
+
+  // ドスンとした低音オシレータ
+  const osc = audioCtx.createOscillator();
+  const oscGain = audioCtx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(180, now);
+  osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
+  oscGain.gain.setValueAtTime(0.4, now);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+  osc.connect(oscGain);
+  oscGain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.5);
+}
 // スタート画面・ゲームオーバー画面でもタッチで切り替えられるよう追加
 beatBtn.addEventListener("touchstart", (e) => {
   e.preventDefault();
@@ -796,9 +863,10 @@ beatBtn.addEventListener("touchstart", (e) => {
 
 function spawnBlock(playAudio = true) {
   let type;
+  const pool = getAllowedTypes();
   do {
-    type = BLOCK_TYPES[Math.floor(Math.random() * BLOCK_TYPES.length)];
-  } while (type === lastType);
+    type = pool[Math.floor(Math.random() * pool.length)];
+  } while (type === lastType && pool.length > 1);
 
   lastType = type;
   const ai = Math.floor(Math.random() * 4);
@@ -835,9 +903,10 @@ function spawnBlock(playAudio = true) {
 
 function nextBlockType(playAudio = true) {
   let type;
+  const pool = getAllowedTypes();
   do {
-    type = BLOCK_TYPES[Math.floor(Math.random() * BLOCK_TYPES.length)];
-  } while (type === lastType);
+    type = pool[Math.floor(Math.random() * pool.length)];
+  } while (type === lastType && pool.length > 1);
 
   lastType = type;
   block.type = type;
@@ -856,6 +925,103 @@ function nextBlockType(playAudio = true) {
   if (playAudio) bgm.play().catch(() => {});
 }
 
+// ===== マイスターお祝いアニメーション =====
+let maisterAnim = null; // null or { frame, maxFrames }
+
+function startMaisterCelebration() {
+  isMaister = true;
+  maisterAnim = { frame: 0, maxFrames: 180 };
+  // gameStarted は維持（アニメ中もdraw等が動くように）
+  // gameOver フラグで入力だけ止める
+  gameOver = true;
+  bgm.pause();
+  bgm.currentTime = 0;
+  // お祝いの効果音（明るいファンファーレ風）
+  playMaisterSound();
+  // 大量の成功バーストを生成
+  for (let burst = 0; burst < 6; burst++) {
+    setTimeout(() => {
+      for (let i = 0; i < 3; i++) {
+        createSuccessBurst(
+          80 + Math.random() * 240,
+          100 + Math.random() * 300
+        );
+      }
+    }, burst * 200);
+  }
+}
+
+function playMaisterSound() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
+
+  const notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
+  notes.forEach((freq, i) => {
+    const osc  = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.18);
+    gain.gain.linearRampToValueAtTime(0.28, audioCtx.currentTime + i * 0.18 + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.18 + 0.5);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(audioCtx.currentTime + i * 0.18);
+    osc.stop(audioCtx.currentTime + i * 0.18 + 0.5);
+  });
+}
+
+function drawMaisterCelebration() {
+  if (!maisterAnim) return;
+  const f = maisterAnim.frame;
+  const alpha = f < 30 ? f / 30 : (f > 150 ? 1 - (f - 150) / 30 : 1);
+
+  // 全画面ゴールドオーバーレイ
+  ctx.save();
+  ctx.globalAlpha = alpha * 0.18;
+  const grad = ctx.createRadialGradient(200, 300, 10, 200, 300, 350);
+  grad.addColorStop(0, "#ffd76b");
+  grad.addColorStop(1, "rgba(255,215,107,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  // 「MAISTER!」テキスト
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const pulse = 1 + Math.sin(f * 0.15) * 0.06;
+  ctx.font = `bold ${Math.round(48 * pulse)}px "Segoe UI","Yu Gothic",sans-serif`;
+  ctx.fillStyle = "#ffd76b";
+  ctx.shadowColor = "rgba(255,215,107,0.9)";
+  ctx.shadowBlur = 28;
+  ctx.fillText("🏆 マイスター認定 🏆", canvas.width / 2, canvas.height / 2 - 20);
+  ctx.font = `bold 22px "Segoe UI","Yu Gothic",sans-serif`;
+  ctx.fillStyle = "#fff";
+  ctx.shadowBlur = 10;
+  ctx.fillText("Heart Sound Maister!", canvas.width / 2, canvas.height / 2 + 36);
+  ctx.restore();
+}
+
+function updateMaisterAnim() {
+  if (!maisterAnim) return;
+  maisterAnim.frame++;
+  // パーティクルを追加で飛ばし続ける
+  if (maisterAnim.frame % 12 === 0) {
+    createSuccessBurst(
+      60 + Math.random() * 280,
+      60 + Math.random() * 400
+    );
+  }
+  if (maisterAnim.frame >= maisterAnim.maxFrames) {
+    maisterAnim = null;
+    endGame();
+  }
+}
+
 function endGame() {
   gameOver = true;
   gameStarted = false;
@@ -864,7 +1030,7 @@ function endGame() {
   bgm.currentTime = 0;
   bgm.volume = 0.8;
 
-  playGameOverSound();
+  if (score < 50) playGameOverSound();
 
   spawnBlock(false);
 
@@ -1260,7 +1426,13 @@ function updateParticles() {
 }
 
 function drawBlock() {
-  if (!block || !heartLoaded) return;
+  if (!block) return;
+  
+  // マイスター画像を使うかどうか
+  const useHeartImg = isMaister
+    ? (heartMaisterLoaded ? heartMaisterImg : (heartLoaded ? heartImg : null))
+    : (heartLoaded ? heartImg : null);
+  if (!useHeartImg) return;
   
   // dying状態の場合は特別な描画
   if (block.state === "dying") {
@@ -1289,7 +1461,7 @@ function drawBlock() {
     // 心臓を描画（回転しながら縮小）
     ctx.translate(block.x, block.y);
     ctx.rotate(progress * Math.PI * 2); // 回転
-    ctx.drawImage(heartImg, -size / 2, -size / 2, size, size);
+    ctx.drawImage(useHeartImg, -size / 2, -size / 2, size, size);
     
     ctx.restore();
     return;
@@ -1317,7 +1489,7 @@ if (gameStarted) {
     ctx.fill();
   }
 
-  ctx.drawImage(heartImg, block.x - size / 2, block.y - size / 2, size, size);
+  ctx.drawImage(useHeartImg, block.x - size / 2, block.y - size / 2, size, size);
 
   if (block.state === "success") {
     const pulseR = 14 + Math.sin(block.hitFrame * 0.34) * 3;
@@ -1533,6 +1705,7 @@ function draw() {
   drawDangerLine();
   drawPlayer();
   drawHUD();
+  drawMaisterCelebration();
 }
 
 function updateBlock() {
@@ -1583,6 +1756,9 @@ function updateBlock() {
     block.dyingScale = 1;
     block.dyingAlpha = 1;
     
+    // 爆発効果音を鳴らす
+    playExplosionSound();
+
     // BGMをフェードアウト
     if (fadeOutTimer) clearInterval(fadeOutTimer);
     fadeOutTimer = setInterval(() => {
@@ -1624,8 +1800,8 @@ function checkDiagnosticHits() {
 function update() {
   if (!gameStarted || gameOver || !block) return;
 
-  if (score >= 50) {
-    endGame();
+  if (score >= 50 && !maisterAnim) {
+    startMaisterCelebration();
     return;
   }
 
@@ -1646,7 +1822,12 @@ function loop() {
   dangerLinePhase += 0.15;
   labelAngle += (labelAngleTo - labelAngle) * (gameStarted ? 0.18 : 0.08);
 
-  if (gameStarted && !gameOver) {
+  if (maisterAnim) {
+    // マイスターお祝い中
+    updateMaisterAnim();
+    updateParticles();
+    updateStars();
+  } else if (gameStarted && !gameOver) {
     update();
   } else {
     updateShootAnim();
