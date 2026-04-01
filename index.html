@@ -496,7 +496,7 @@
     </div>
   </div>
 
-  <div class="overlay-disclaimer">心音の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害について一切の責任を負いかねます．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
+  <div class="overlay-disclaimer">心音の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害について一切の責任を負いかねます．音声は全て実際の心音です．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
   </div>
 
   <div id="controls">
@@ -1155,8 +1155,15 @@ addPress(document.getElementById("fireBtn"), fireAction);
 // strength: 各拍動の強さ
 // duration: 拍動の持続時間（秒）
 const BEAT_PATTERNS = {
-  // 正常心音 - S1とS2
-  "normal.mp3": { 
+  // 正常心音（心尖部）- S1とS2
+  "apex.mp3": { 
+    beats: [0, 0.35], 
+    bpm: 72, 
+    strength: [1.0, 0.7],
+    duration: [0.08, 0.06]
+  },
+  // 正常心音（心基部）- S1とS2
+  "base.mp3": { 
     beats: [0, 0.35], 
     bpm: 72, 
     strength: [1.0, 0.7],
@@ -1266,7 +1273,7 @@ const DEFAULT_BEAT_PATTERN = {
 function getBeat() {
   if (!beatEnabled) return 0;
   
-  const soundFile = block ? block.type.sound : "normal.mp3";
+  const soundFile = block ? block.type.sound : "apex.mp3";
   const p = BEAT_PATTERNS[soundFile] || DEFAULT_BEAT_PATTERN;
   
   // 音声の現在時刻を使用（より正確な同期）
@@ -1369,17 +1376,38 @@ function playWrongSound() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === "suspended") audioCtx.resume();
   const now = audioCtx.currentTime;
+  // サイン波に変更してマイルドに、音量も下げる
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-  osc.type = "sawtooth";
-  osc.frequency.setValueAtTime(180, now);
-  osc.frequency.exponentialRampToValueAtTime(90, now + 0.18);
-  gain.gain.setValueAtTime(0.18, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(260, now);
+  osc.frequency.exponentialRampToValueAtTime(160, now + 0.28);
+  gain.gain.setValueAtTime(0.09, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
   osc.connect(gain);
   gain.connect(audioCtx.destination);
   osc.start(now);
-  osc.stop(now + 0.22);
+  osc.stop(now + 0.32);
+}
+
+function playCorrectSound() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  const now = audioCtx.currentTime;
+  // 短い2音の上昇チャイム
+  [520, 780].forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, now + i * 0.10);
+    gain.gain.linearRampToValueAtTime(0.13, now + i * 0.10 + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.10 + 0.18);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now + i * 0.10);
+    osc.stop(now + i * 0.10 + 0.20);
+  });
 }
 
 function processHit(diagnostic, isCorrect) {
@@ -1397,6 +1425,7 @@ function processHit(diagnostic, isCorrect) {
     updateLevel();
     updateScoreHUD();
     createSuccessBurst(block.x, block.y + block.size * 0.18);
+    playCorrectSound();
   } else {
     createShatter(diagnostic.x, diagnostic.y);
     // 不正解：心臓を少し下げ＋揺れリアクション開始
