@@ -894,7 +894,11 @@ function spawnBlock(playAudio = true) {
     dyingFrame: 0,
     dyingMaxFrames: 120,
     dyingScale: 1,
-    dyingAlpha: 1
+    dyingAlpha: 1,
+    // 不正解リアクション用
+    wrongFrame: 0,
+    wrongMaxFrames: 0,
+    wrongShake: 0
   };
   labelAngle = labelAngleTo = ai * Math.PI / 2;
 
@@ -922,6 +926,9 @@ function nextBlockType(playAudio = true) {
   block.dyingFrame = 0;
   block.dyingScale = 1;
   block.dyingAlpha = 1;
+  block.wrongFrame = 0;
+  block.wrongMaxFrames = 0;
+  block.wrongShake = 0;
 
   const ni = Math.floor(Math.random() * 4);
   block.angleIndex = ni;
@@ -1061,6 +1068,7 @@ function spawnDiagnostic() {
 function fireAction() {
   if (!gameStarted || gameOver || !block) return;
   if (block.state === "dying") return;
+  if (block.wrongFrame > 0 && block.wrongFrame <= block.wrongMaxFrames) return; // 不正解リアクション中は発射不可
   if (player.shootAnim || diagnostics.some(d => d.state === "flying" || d.state === "launch")) return;
   if (bgm.paused) bgm.play().catch(() => {});
   player.shootAnim = { phase: "compress", frame: 0 };
@@ -1357,12 +1365,29 @@ function createDyingParticles(x, y) {
   }
 }
 
+function playWrongSound() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(180, now);
+  osc.frequency.exponentialRampToValueAtTime(90, now + 0.18);
+  gain.gain.setValueAtTime(0.18, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.22);
+}
+
 function processHit(diagnostic, isCorrect) {
   diagnostic.state = isCorrect ? "fused" : "shatter";
   if (isCorrect) {
     diagnostic.x = block.x;
     diagnostic.y = block.y + block.size * 0.25;
-    block.y = Math.max(block.baseY, block.y - 25); // 正解時の上昇
+    block.y = Math.max(block.baseY, block.y - 27); // 正解時の上昇
     block.state = "success";
     block.hitFrame = 0;
     block.fuseX = diagnostic.x;
@@ -1374,6 +1399,12 @@ function processHit(diagnostic, isCorrect) {
     createSuccessBurst(block.x, block.y + block.size * 0.18);
   } else {
     createShatter(diagnostic.x, diagnostic.y);
+    // 不正解：心臓を少し下げ＋揺れリアクション開始
+    block.y = Math.min(block.y + 18, GAME_OVER_LINE_Y - block.size / 2 - 2);
+    block.wrongFrame = 1;
+    block.wrongMaxFrames = 28;
+    block.wrongShake = 0;
+    playWrongSound();
   }
 }
 
@@ -1508,7 +1539,21 @@ if (gameStarted) {
     ctx.fill();
   }
 
-  ctx.drawImage(useHeartImg, block.x - size / 2, block.y - size / 2, size, size);
+  ctx.drawImage(useHeartImg, block.x - size / 2 + (block.wrongShake || 0), block.y - size / 2, size, size);
+
+  // 不正解リアクション：赤いグロー
+  if (block.wrongFrame > 0 && block.wrongFrame <= block.wrongMaxFrames) {
+    const wp = block.wrongFrame / block.wrongMaxFrames;
+    const wAlpha = (1 - wp) * 0.55;
+    const wR = size * 0.7;
+    const wGlow = ctx.createRadialGradient(block.x, block.y, 4, block.x, block.y, wR);
+    wGlow.addColorStop(0, `rgba(255,80,80,${wAlpha})`);
+    wGlow.addColorStop(1, "rgba(255,80,80,0)");
+    ctx.fillStyle = wGlow;
+    ctx.beginPath();
+    ctx.arc(block.x, block.y, wR, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   if (block.state === "success") {
     const pulseR = 14 + Math.sin(block.hitFrame * 0.34) * 3;
@@ -1752,6 +1797,18 @@ function updateBlock() {
     return;
   }
 
+  // 不正解リアクションのアップデート
+  if (block.wrongFrame > 0 && block.wrongFrame <= block.wrongMaxFrames) {
+    block.wrongFrame++;
+    const p = block.wrongFrame / block.wrongMaxFrames;
+    // 左右にブルブル揺れる（減衰サイン波）
+    block.wrongShake = Math.sin(p * Math.PI * 5) * (1 - p) * 9;
+    if (block.wrongFrame > block.wrongMaxFrames) {
+      block.wrongFrame = 0;
+      block.wrongShake = 0;
+    }
+  }
+
   if (block.state === "success") {
     block.hitFrame++;
     if (block.y - 3.8 >= block.baseY) {
@@ -1764,7 +1821,7 @@ function updateBlock() {
     return;
   }
 
-  block.speed = 0.20 + score * 0.01; // 落下速度の加速　0.02
+  block.speed = 0.10 + score * 0.015; // 落下速度の加速　0.015
   block.y += block.speed;
 
   const heartBottom = block.y + block.size / 2;
