@@ -1376,7 +1376,6 @@ function playWrongSound() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === "suspended") audioCtx.resume();
   const now = audioCtx.currentTime;
-  // サイン波に変更してマイルドに、音量も下げる
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   osc.type = "sine";
@@ -1394,7 +1393,6 @@ function playCorrectSound() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === "suspended") audioCtx.resume();
   const now = audioCtx.currentTime;
-  // 短い2音の上昇チャイム
   [520, 780].forEach((freq, i) => {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -1955,6 +1953,39 @@ initStars();
 spawnBlock(false);
 showStartOverlay("start");
 loop();
+
+// タブが非アクティブの間もゲームロジックを継続させる
+let hiddenUpdateTimer = null;
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    // タブが隠れた: setIntervalでゲームロジックだけ回し続ける（約60fps相当）
+    if (!hiddenUpdateTimer) {
+      hiddenUpdateTimer = setInterval(() => {
+        if (!gameStarted || gameOver) {
+          clearInterval(hiddenUpdateTimer);
+          hiddenUpdateTimer = null;
+          return;
+        }
+        beatTick++;
+        dangerLinePhase += 0.15;
+        if (maisterAnim) {
+          updateMaisterAnim();
+          updateParticles();
+          updateStars();
+        } else {
+          update();
+        }
+      }, 1000 / 60);
+    }
+  } else {
+    // タブに戻った: setIntervalを止めてrAFに戻す
+    if (hiddenUpdateTimer) {
+      clearInterval(hiddenUpdateTimer);
+      hiddenUpdateTimer = null;
+    }
+  }
+});
 </script>
 </body>
 </html>
