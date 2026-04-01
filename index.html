@@ -547,22 +547,23 @@ let audioCtx = null;
 
 // difficulty: 1=初級, 2=中級, 3=上級
 const BLOCK_TYPES = [
-  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"正常",    sound:"normal.mp3", difficulty:1 },
+  { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"正常",    sound:"apex.mp3", difficulty:1 },
+　{ labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"正常",    sound:"base.mp3", difficulty:1 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅳ音 (S4)", sound:"S4.mp3",     difficulty:1 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅲ音 (S3)", sound:"S3.mp3",     difficulty:1 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"ギャロップ", sound:"gallop.mp3", difficulty:1 },
-  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"収縮期駆出性",   sound:"SEM.mp3",    difficulty:1 },
-  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"全収縮期逆流性", sound:"HSM.mp3",    difficulty:1},
+  { labels:["収縮期駆出性雑音","全収縮期雑音","収縮後期雑音","収縮早期雑音"], correct:"収縮期駆出性雑音",   sound:"SEM.mp3",    difficulty:1 },
+  { labels:["収縮期駆出性雑音","全収縮期雑音","収縮後期雑音","収縮早期雑音"], correct:"全収縮期雑音", sound:"HSM.mp3",    difficulty:1},
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","クリック"],  correct:"クリック",  sound:"click.mp3",  difficulty:2 },
-  { labels:["ランブル","心膜摩擦音","連続性雑音","ギャロップ"],     correct:"心膜摩擦音",     sound:"rub.mp3",    difficulty:2 },
+  { labels:["往復雑音","心膜摩擦音","連続性雑音","ギャロップ"],     correct:"心膜摩擦音",     sound:"rub.mp3",    difficulty:2 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","Ⅱ音肺動脈成分の亢進"], correct:"Ⅱ音肺動脈成分の亢進", sound:"2P.mp3", difficulty:2 },
   { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"],     correct:"往復雑音",       sound:"TAF.mp3",    difficulty:2 },
   { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"],     correct:"連続性雑音",     sound:"CM.mp3",     difficulty:3 },
-  { labels:["収縮期駆出性","全収縮期逆流性","収縮後期","収縮早期"], correct:"収縮後期",       sound:"LSM.mp3",    difficulty:3 },
+  { labels:["収縮期駆出性雑音","全収縮期雑音","収縮後期雑音","収縮早期雑音"], correct:"収縮後期雑音",       sound:"LSM.mp3",    difficulty:3 },
   { labels:["ランブル","心膜摩擦音","連続性雑音","ギャロップ"],     correct:"ランブル",       sound:"rumble.mp3", difficulty:3 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","駆出音"], correct:"駆出音",   sound:"ej.mp3",     difficulty:3 },
-  { labels:["正常（心基部）","正常（心尖部）","Ⅱ音肺動脈成分の亢進","ギャロップ"],     correct:"正常（心尖部）",       sound:"apex.mp3", difficulty:3 },
-  { labels:["正常（心基部）","正常（心尖部）","Ⅱ音肺動脈成分の亢進","ギャロップ"],     correct:"正常（心基部）",       sound:"base.mp3", difficulty:3 }
+  { labels:["正常（心基部）","正常（心尖部）","Ⅲ音 (S3)","Ⅳ音 (S4)"],     correct:"正常（心尖部）",       sound:"apex.mp3", difficulty:3 },
+  { labels:["正常（心基部）","正常（心尖部）","Ⅲ音 (S3)","Ⅳ音 (S4)"],     correct:"正常（心基部）",       sound:"base.mp3", difficulty:3 }
 ];
 
 // 現在の難易度に応じて出題する問題をフィルタ
@@ -592,8 +593,8 @@ if (heartImg.complete && heartImg.naturalWidth > 0) heartLoaded = true;
 if (heartMaisterImg.complete && heartMaisterImg.naturalWidth > 0) heartMaisterLoaded = true;
 if (stethImg.complete && stethImg.naturalWidth > 0) stethLoaded = true;
 
-// マイスター達成フラグ（一度達成したらtrue固定）
-let isMaister = false;
+// マイスター達成フラグ（一度達成したらtrue固定・localStorageで永続化）
+let isMaister = localStorage.getItem("heartSoundMaister") === "true";
 
 let score = 0;
 let block;
@@ -687,7 +688,7 @@ function drawSpaceBackground() {
 }
 
 function updateLevel() {
-  if (score >= 50) levelText = "マイスター";
+  if (score >= 50) levelText = "マイスター";　// ここの数値は最終画面の格付け用
   else if (score >= 25) levelText = "上級";
   else if (score >= 10) levelText = "中級";
   else levelText = "初級";
@@ -723,11 +724,16 @@ function showStartOverlay(mode = "start") {
   if (mode === "start") {
     startHeading.textContent = "心音マイスターへ";
     startSub.textContent = "";
-    overlayScore.style.display = "none";
+    if (isMaister) {
+      overlayScore.style.display = "block";
+      overlayScore.innerHTML = `🏆 <span style="color:var(--gold)">マイスター認定済み</span>`;
+    } else {
+      overlayScore.style.display = "none";
+    }
     controlGuide.style.display = "block";
     startBtn.textContent = "START";
   } else {
-    startHeading.textContent = score >= 50 ? "🏆マイスター認定🏆" : "ゲームオーバー";
+    startHeading.textContent = score >= 50 ? "🏆 完全制覇 🏆" : "ゲームオーバー";
     startSub.textContent = "";
     overlayScore.style.display = "block";
     overlayScore.textContent = `格付け：${levelText}`;
@@ -930,7 +936,8 @@ let maisterAnim = null; // null or { frame, maxFrames }
 
 function startMaisterCelebration() {
   isMaister = true;
-  maisterAnim = { frame: 0, maxFrames: 180 };
+  localStorage.setItem("heartSoundMaister", "true");
+  maisterAnim = { frame: 0, maxFrames: 480 }; // お祝い時間
   // gameStarted は維持（アニメ中もdraw等が動くように）
   // gameOver フラグで入力だけ止める
   gameOver = true;
@@ -993,8 +1000,8 @@ function drawMaisterCelebration() {
   ctx.globalAlpha = alpha;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const pulse = 1 + Math.sin(f * 0.15) * 0.06;
-  ctx.font = `bold ${Math.round(48 * pulse)}px "Segoe UI","Yu Gothic",sans-serif`;
+  const pulse = 1 + Math.sin(f * 0.08) * 0.20; // マイスターアニメーションの文字の変動（速度は0.08，率は0.20）
+  ctx.font = `bold ${Math.round(34 * pulse)}px "Segoe UI","Yu Gothic",sans-serif`;　// マイスターアニメーションの文字の大きさ
   ctx.fillStyle = "#ffd76b";
   ctx.shadowColor = "rgba(255,215,107,0.9)";
   ctx.shadowBlur = 28;
@@ -1074,14 +1081,26 @@ function rotateRight() {
 }
 
 document.addEventListener("keydown", e => {
-  if (!gameStarted && e.key === " ") {
+  // START画面で Enter / Space で開始
+  if (!gameStarted && (e.key === "Enter" || e.key === " ")) {
     e.preventDefault();
     startGame();
     return;
   }
+
+  // RETRY画面で Enter で再開
+  if (gameOver && e.key === "Enter") {
+    e.preventDefault();
+    startGame();
+    return;
+  }
+
   if (gameOver) return;
+
   if (e.key === "ArrowLeft") rotateLeft();
   if (e.key === "ArrowRight") rotateRight();
+
+  // 診断（Space）
   if (e.key === " ") {
     e.preventDefault();
     fireAction();
@@ -1343,7 +1362,7 @@ function processHit(diagnostic, isCorrect) {
   if (isCorrect) {
     diagnostic.x = block.x;
     diagnostic.y = block.y + block.size * 0.25;
-    block.y = Math.max(block.baseY, block.y - 20);
+    block.y = Math.max(block.baseY, block.y - 25); // 正解時の上昇
     block.state = "success";
     block.hitFrame = 0;
     block.fuseX = diagnostic.x;
@@ -1745,7 +1764,7 @@ function updateBlock() {
     return;
   }
 
-  block.speed = 0.20 + score * 0.02;
+  block.speed = 0.20 + score * 0.01; // 落下速度の加速　0.02
   block.y += block.speed;
 
   const heartBottom = block.y + block.size / 2;
@@ -1800,7 +1819,7 @@ function checkDiagnosticHits() {
 function update() {
   if (!gameStarted || gameOver || !block) return;
 
-  if (score >= 50 && !maisterAnim) {
+  if (score >= 50 && !maisterAnim) { // マイスター設定　50点
     startMaisterCelebration();
     return;
   }
