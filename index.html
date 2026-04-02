@@ -635,12 +635,14 @@ function updateControlsGuide() {
     ? [
         "背景にながれている心音を診断",
         "選択肢を回転・スワイプで変更",
-        "中央ボタンで診断ミサイル発射"
+        "中央ボタンで診断ミサイル発射",
+        "50問連続正解でマイスター認定"
       ]
     : [
-        "背景に流れている心音を診断",
-        "選択肢を左右矢印キーで変更",
-        "スペースで診断ミサイル発射"
+        "背景にながれている心音を診断",
+        "選択肢を左右の矢印キーで変更",
+        "中央ボタンで診断ミサイル発射",
+        "50問連続正解でマイスター認定"
       ];
 
   controlGuide.innerHTML = `
@@ -727,11 +729,10 @@ function showStartOverlay(mode = "start") {
     startHeading.textContent = "心音マイスターへ";
     startSub.textContent = "";
     if (isMaister) {
-      overlayScore.style.display = "block";
-      overlayScore.innerHTML = `🏆 <span style="color:var(--gold)">マイスター認定済み</span>`;
-    } else {
-      overlayScore.style.display = "none";
-    }
+  overlayScore.style.display = "none";
+} else {
+  overlayScore.style.display = "none";
+}
     controlGuide.style.display = "block";
     startBtn.textContent = "START";
   } else {
