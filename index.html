@@ -686,8 +686,8 @@ if (stethImg.complete && stethImg.naturalWidth > 0) stethLoaded = true;
 let isMaister = localStorage.getItem("heartSoundMaister") === "true";
 
 let score = 0;
-let savedScore = 0;      // 練習モード終了時に表示するゲームオーバー時のスコア
-let savedLevelText = "初級"; // 同じく格付け
+let savedScore = 0;
+let savedLevelText = "初級";
 let block;
 let diagnostics = [];
 let particles = [];
@@ -950,6 +950,10 @@ practiceModeBar.addEventListener("click", () => {
   practiceModeBar.style.display = "none";
   practiceRetryBtn.style.display = "none";
   document.getElementById("hudScore").style.display = "";
+  // スコアをゲーム終了時の値に戻す
+  score = savedScore;
+  levelText = savedLevelText;
+  updateScoreHUD();
   gameOver = true;
   gameStarted = false;
   bgm.pause();
@@ -957,8 +961,8 @@ practiceModeBar.addEventListener("click", () => {
   bgm.volume = 0.8;
   spawnBlock(false);
   updateControlButtons();
-  showStartOverlay("retry"); // practiceMode=true のまま呼ぶことでsaved値を使う
-  practiceMode = false;      // overlay表示後にリセット
+  showStartOverlay("retry"); // practiceMode=true のまま呼んでsaved値を使う
+  practiceMode = false;
 });
 beatBtn.addEventListener("click", () => {
   beatEnabled = !beatEnabled;
@@ -1204,7 +1208,6 @@ function endGame() {
   bgm.currentTime = 0;
   bgm.volume = 0.8;
 
-  // ゲーム終了時のスコア・格付けを保存（練習モード終了後の表示用）
   savedScore = score;
   savedLevelText = levelText;
 
