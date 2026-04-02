@@ -417,9 +417,76 @@
     to { left: 120%; }
   }
 
+  #practiceBtn {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px; /* retryと同じ値にする */
+    z-index: 21;
+    padding: 13px 32px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    border-radius: 999px;
+    border: 1px solid rgba(255,180,100,0.38);
+    color: rgba(255,210,130,0.95);
+    background: rgba(255,160,60,0.10);
+    box-shadow: 0 8px 22px rgba(255,140,40,0.12);
+    cursor: pointer;
+    display: none;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    backdrop-filter: blur(6px);
+  }
+
+  #practiceBtn:hover { background: rgba(255,160,60,0.20); }
+  #practiceBtn:active { transform: translateX(-50%) scale(0.98); }
+
+  #practiceModeBar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 8px 16px;
+    background: rgba(255,160,60,0.18);
+    border-bottom: 1px solid rgba(255,180,80,0.30);
+    color: rgba(255,220,140,0.95);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-align: center;
+    z-index: 30;
+    display: none;
+  }
+
+  #practiceRetryBtn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -200px);
+    z-index: 25;
+    padding: 14px 36px;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.22);
+    color: white;
+    background: linear-gradient(135deg, var(--accent-a), var(--accent-b) 56%, var(--accent-c));
+    box-shadow: 0 14px 28px rgba(34,87,255,0.28), 0 0 20px rgba(124,247,255,0.20);
+    cursor: pointer;
+    font-family: inherit;
+    display: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  #practiceRetryBtn:hover { transform: translate(-50%, -202px) scale(1.02); }
+  #practiceRetryBtn:active { transform: translate(-50%, -198px) scale(0.98); }
+
   @media (max-width: 640px) {
     .start-panel { padding: 22px 18px 20px; border-radius: 24px; }
     #startBtn { min-width: 100%; }
+    #practiceBtn { min-width: 100%; }
     #hudScore { top: 10px; right: 10px; padding: 9px 12px; }
     #beatToggle { top: 10px; left: 10px; padding: 9px 12px; min-width: 124px; }
     .overlay-disclaimer {
@@ -499,11 +566,16 @@
   <div class="overlay-disclaimer">心音の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害について一切の責任を負いかねます．音声は全て実際の心音です．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
   </div>
 
+  <button id="practiceBtn">練習モード</button>
+
   <div id="controls">
     <button class="ctrl-btn" id="leftBtn">◀</button>
     <button id="fireBtn">診断</button>
     <button class="ctrl-btn" id="rightBtn">▶</button>
   </div>
+
+  <div id="practiceModeBar">練習モード</div>
+  <button id="practiceRetryBtn">RETRY</button>
 </div>
 
 <script>
@@ -526,6 +598,11 @@ const fireGuideKey = document.getElementById("fireGuideKey");
 const fireGuideValue = document.getElementById("fireGuideValue");
 
 const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || ("ontouchstart" in window);
+
+let practiceMode = false;
+const practiceModeBar = document.getElementById("practiceModeBar");
+const practiceRetryBtn = document.getElementById("practiceRetryBtn");
+const practiceBtn = document.getElementById("practiceBtn");
 
 function resizeCanvas() {
   const ch = isMobile && gameStarted ? 90 : 0;
@@ -735,6 +812,7 @@ function showStartOverlay(mode = "start") {
 }
     controlGuide.style.display = "block";
     startBtn.textContent = "START";
+    practiceBtn.style.display = "none";
   } else {
     startHeading.textContent = score >= 50 ? "🏆 完全制覇 🏆" : "ゲームオーバー";
     startSub.textContent = "";
@@ -742,6 +820,7 @@ function showStartOverlay(mode = "start") {
     overlayScore.textContent = `格付け：${levelText}`;
     controlGuide.style.display = "none";
     startBtn.textContent = "RETRY";
+    practiceBtn.style.display = "block";
   }
 }
 
@@ -763,6 +842,11 @@ function resetGameState() {
 }
 
 function startGame() {
+  practiceMode = false;
+  practiceModeBar.style.display = "none";
+  practiceRetryBtn.style.display = "none";
+  practiceBtn.style.display = "none";
+  document.getElementById("hudScore").style.display = "";
   resetGameState();
 
   bgm.pause();
@@ -773,6 +857,33 @@ function startGame() {
   hideStartOverlay();
   resizeCanvas();
   // iOS Safari のレイアウト再計算が完了してからボタンを表示する
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      updateControlButtons();
+    });
+  });
+
+  spawnBlock(true);
+}
+
+function startPracticeMode() {
+  practiceMode = true;
+  resetGameState();
+
+  bgm.pause();
+  bgm.currentTime = 0;
+  bgm.volume = 0.8;
+
+  gameStarted = true;
+  hideStartOverlay();
+
+  // スコアHUD非表示
+  document.getElementById("hudScore").style.display = "none";
+  practiceBtn.style.display = "none";
+  practiceModeBar.style.display = "block";
+  practiceRetryBtn.style.display = "block";
+
+  resizeCanvas();
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       updateControlButtons();
@@ -815,6 +926,10 @@ function playGameOverSound() {
 }
 
 startBtn.addEventListener("click", startGame);
+practiceBtn.addEventListener("click", startPracticeMode);
+practiceRetryBtn.addEventListener("click", () => {
+  startGame();
+});
 beatBtn.addEventListener("click", () => {
   beatEnabled = !beatEnabled;
   updateBeatBtn();
@@ -1727,6 +1842,7 @@ function drawParticles() {
 }
 
 function drawDangerLine() {
+  if (practiceMode) return;
   const grad = ctx.createLinearGradient(
     76,
     GAME_OVER_LINE_Y,
@@ -1818,6 +1934,48 @@ function draw() {
 
 function updateBlock() {
   if (!block) return;
+
+  // 練習モード: 心臓を画面中央に固定、落下なし
+  if (practiceMode) {
+    block.x = GAME_W / 2;
+    block.y = GAME_H / 2 - 30;
+    block.baseY = block.y;
+
+    // dying状態の更新（練習モードでは復帰）
+    if (block.state === "dying") {
+      block.dyingFrame++;
+      const progress = block.dyingFrame / block.dyingMaxFrames;
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      block.dyingScale = 1 - easeOutQuart * 0.9;
+      block.dyingAlpha = 1 - easeOutQuart;
+      if (block.dyingFrame === 15) createDyingParticles(block.x, block.y);
+      if (block.dyingFrame >= block.dyingMaxFrames) {
+        // 練習モードでは次の問題へ（ゲームオーバーにならない）
+        nextBlockType(true);
+        block.x = GAME_W / 2;
+        block.y = GAME_H / 2 - 30;
+      }
+      return;
+    }
+
+    // 不正解リアクション
+    if (block.wrongFrame > 0 && block.wrongFrame <= block.wrongMaxFrames) {
+      block.wrongFrame++;
+      const p = block.wrongFrame / block.wrongMaxFrames;
+      block.wrongShake = Math.sin(p * Math.PI * 5) * (1 - p) * 9;
+      if (block.wrongFrame > block.wrongMaxFrames) {
+        block.wrongFrame = 0;
+        block.wrongShake = 0;
+      }
+    }
+
+    if (block.state === "success") {
+      block.hitFrame++;
+      if (block.hitFrame > 24) nextBlockType(true);
+      return;
+    }
+    return;
+  }
 
   // dying状態の更新
   if (block.state === "dying") {
@@ -1920,7 +2078,7 @@ function checkDiagnosticHits() {
 function update() {
   if (!gameStarted || gameOver || !block) return;
 
-  if (score >= 50 && !maisterAnim) { // マイスター設定　50点
+  if (!practiceMode && score >= 50 && !maisterAnim) { // マイスター設定　50点
     startMaisterCelebration();
     return;
   }
