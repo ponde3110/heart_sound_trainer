@@ -570,7 +570,7 @@ const BLOCK_TYPES = [
 
 // 現在の難易度に応じて出題する問題をフィルタ
 function getAllowedTypes() {
-  if (score >= 30) return BLOCK_TYPES; // 上級：全問
+  if (score >= 25) return BLOCK_TYPES; // 上級：全問
   if (score >= 10) return BLOCK_TYPES.filter(t => t.difficulty <= 2); // 中級：初級＋中級
   return BLOCK_TYPES.filter(t => t.difficulty === 1); // 初級のみ
 }
@@ -693,7 +693,7 @@ function drawSpaceBackground() {
 
 function updateLevel() {
   if (score >= 50) levelText = "マイスター";　// ここの数値は最終画面の格付け用
-  else if (score >= 30) levelText = "上級";
+  else if (score >= 35) levelText = "上級";
   else if (score >= 10) levelText = "中級";
   else levelText = "初級";
 }
