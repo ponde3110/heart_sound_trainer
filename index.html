@@ -418,38 +418,42 @@
   }
 
   #practiceBtn {
-    position: absolute;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 220px; /* retryと同じ値にする */
-    z-index: 21;
-    padding: 13px 32px;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    border-radius: 999px;
-    border: 1px solid rgba(255,180,100,0.38);
-    color: rgba(255,210,130,0.95);
-    background: rgba(255,160,60,0.10);
-    box-shadow: 0 8px 22px rgba(255,140,40,0.12);
-    cursor: pointer;
-    display: none;
-    font-family: inherit;
-    white-space: nowrap;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    backdrop-filter: blur(6px);
-  }
+  position: relative;
+  margin: 10px auto 0;
 
-  #practiceBtn:hover { background: rgba(255,160,60,0.20); }
-  #practiceBtn:active { transform: translateX(-50%) scale(0.98); }
+  width: auto;          /* ← これ重要（100%をやめる） */
+  padding: 14px 36px;   /* ← RETRYと同じにする */
+  font-size: 15px;      /* ← 少しだけ小さめに残すならそのまま */
+
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,180,100,0.38);
+  color: rgba(255,210,130,0.95);
+  background: rgba(255,160,60,0.10);
+  box-shadow: 0 8px 22px rgba(255,140,40,0.12);
+
+  cursor: pointer;
+  display: none;
+  font-family: inherit;
+  white-space: nowrap;
+
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+  #practiceBtn:hover { background: rgba(255,160,60,0.22); }
+  #practiceBtn:active { transform: scale(0.98); }
 
   #practiceModeBar {
     position: absolute;
-    top: 0; left: 0; right: 0;
-    padding: 8px 16px;
-    background: rgba(255,160,60,0.18);
-    border-bottom: 1px solid rgba(255,180,80,0.30);
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 7px 22px;
+    background: rgba(255,160,60,0.15);
+    border: 1px solid rgba(255,180,80,0.30);
+    border-radius: 999px;
     color: rgba(255,220,140,0.95);
     font-size: 13px;
     font-weight: 700;
@@ -457,7 +461,13 @@
     text-align: center;
     z-index: 30;
     display: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    transition: background 0.18s ease;
   }
+
+  #practiceModeBar:hover { background: rgba(255,160,60,0.28); }
 
   #practiceRetryBtn {
     position: absolute;
@@ -486,7 +496,6 @@
   @media (max-width: 640px) {
     .start-panel { padding: 22px 18px 20px; border-radius: 24px; }
     #startBtn { min-width: 100%; }
-    #practiceBtn { min-width: 100%; }
     #hudScore { top: 10px; right: 10px; padding: 9px 12px; }
     #beatToggle { top: 10px; left: 10px; padding: 9px 12px; min-width: 124px; }
     .overlay-disclaimer {
@@ -496,6 +505,7 @@
       line-height: 1.45;
     }
   }
+  
   #overlayHeart {
   width: 90px;
   display: block;
@@ -557,6 +567,7 @@
     <div id="controlGuide"></div>
 
     <button id="startBtn">START</button>
+    <button id="practiceBtn">練習モード（全問）</button>
 
     <div class="overlay-footer">
       <div class="overlay-copyright">©2026 ponde3110</div>
@@ -566,15 +577,13 @@
   <div class="overlay-disclaimer">心音の解釈は必ずしも一義的ではないため，本アプリに掲載された情報に基づいて生じたいかなる損害について一切の責任を負いかねます．音声は全て実際の心音です．本アプリに含まれるすべてのコンテンツは，著作権法により保護されています．</div>
   </div>
 
-  <button id="practiceBtn">練習モード</button>
-
   <div id="controls">
     <button class="ctrl-btn" id="leftBtn">◀</button>
     <button id="fireBtn">診断</button>
     <button class="ctrl-btn" id="rightBtn">▶</button>
   </div>
 
-  <div id="practiceModeBar">練習モード</div>
+  <button id="practiceModeBar">練習モード終了</button>
   <button id="practiceRetryBtn">RETRY</button>
 </div>
 
@@ -600,6 +609,7 @@ const fireGuideValue = document.getElementById("fireGuideValue");
 const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || ("ontouchstart" in window);
 
 let practiceMode = false;
+let practiceAllIndex = 0; // 全問順番モード用インデックス
 const practiceModeBar = document.getElementById("practiceModeBar");
 const practiceRetryBtn = document.getElementById("practiceRetryBtn");
 const practiceBtn = document.getElementById("practiceBtn");
@@ -868,6 +878,7 @@ function startGame() {
 
 function startPracticeMode() {
   practiceMode = true;
+  practiceAllIndex = 0;
   resetGameState();
 
   bgm.pause();
@@ -881,7 +892,7 @@ function startPracticeMode() {
   document.getElementById("hudScore").style.display = "none";
   practiceBtn.style.display = "none";
   practiceModeBar.style.display = "block";
-  practiceRetryBtn.style.display = "block";
+  // practiceRetryBtn.style.display = "block";
 
   resizeCanvas();
   requestAnimationFrame(() => {
@@ -929,6 +940,21 @@ startBtn.addEventListener("click", startGame);
 practiceBtn.addEventListener("click", startPracticeMode);
 practiceRetryBtn.addEventListener("click", () => {
   startGame();
+});
+practiceModeBar.addEventListener("click", () => {
+  // 練習モード終了 → ゲームオーバー画面へ
+  practiceMode = false;
+  practiceModeBar.style.display = "none";
+  practiceRetryBtn.style.display = "none";
+  document.getElementById("hudScore").style.display = "";
+  gameOver = true;
+  gameStarted = false;
+  bgm.pause();
+  bgm.currentTime = 0;
+  bgm.volume = 0.8;
+  spawnBlock(false);
+  updateControlButtons();
+  showStartOverlay("retry");
 });
 beatBtn.addEventListener("click", () => {
   beatEnabled = !beatEnabled;
@@ -987,10 +1013,16 @@ beatBtn.addEventListener("touchstart", (e) => {
 
 function spawnBlock(playAudio = true) {
   let type;
-  const pool = getAllowedTypes();
-  do {
-    type = pool[Math.floor(Math.random() * pool.length)];
-  } while (type === lastType && pool.length > 1);
+  if (practiceMode) {
+    practiceAllIndex = practiceAllIndex % BLOCK_TYPES.length;
+    type = BLOCK_TYPES[practiceAllIndex];
+    practiceAllIndex++;
+  } else {
+    const pool = getAllowedTypes();
+    do {
+      type = pool[Math.floor(Math.random() * pool.length)];
+    } while (type === lastType && pool.length > 1);
+  }
 
   lastType = type;
   const ai = Math.floor(Math.random() * 4);
@@ -1031,10 +1063,16 @@ function spawnBlock(playAudio = true) {
 
 function nextBlockType(playAudio = true) {
   let type;
-  const pool = getAllowedTypes();
-  do {
-    type = pool[Math.floor(Math.random() * pool.length)];
-  } while (type === lastType && pool.length > 1);
+  if (practiceMode) {
+    practiceAllIndex = practiceAllIndex % BLOCK_TYPES.length;
+    type = BLOCK_TYPES[practiceAllIndex];
+    practiceAllIndex++;
+  } else {
+    const pool = getAllowedTypes();
+    do {
+      type = pool[Math.floor(Math.random() * pool.length)];
+    } while (type === lastType && pool.length > 1);
+  }
 
   lastType = type;
   block.type = type;
