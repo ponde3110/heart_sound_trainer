@@ -686,6 +686,8 @@ if (stethImg.complete && stethImg.naturalWidth > 0) stethLoaded = true;
 let isMaister = localStorage.getItem("heartSoundMaister") === "true";
 
 let score = 0;
+let savedScore = 0;      // 練習モード終了時に表示するゲームオーバー時のスコア
+let savedLevelText = "初級"; // 同じく格付け
 let block;
 let diagnostics = [];
 let particles = [];
@@ -824,10 +826,12 @@ function showStartOverlay(mode = "start") {
     startBtn.textContent = "START";
     practiceBtn.style.display = "none";
   } else {
-    startHeading.textContent = score >= 50 ? "🏆 完全制覇 🏆" : "ゲームオーバー";
+    const displayScore = practiceMode ? savedScore : score;
+    const displayLevel = practiceMode ? savedLevelText : levelText;
+    startHeading.textContent = displayScore >= 50 ? "🏆 完全制覇 🏆" : "ゲームオーバー";
     startSub.textContent = "";
     overlayScore.style.display = "block";
-    overlayScore.textContent = `格付け：${levelText}`;
+    overlayScore.textContent = `格付け：${displayLevel}`;
     controlGuide.style.display = "none";
     startBtn.textContent = "RETRY";
     practiceBtn.style.display = "block";
@@ -943,7 +947,6 @@ practiceRetryBtn.addEventListener("click", () => {
 });
 practiceModeBar.addEventListener("click", () => {
   // 練習モード終了 → ゲームオーバー画面へ
-  practiceMode = false;
   practiceModeBar.style.display = "none";
   practiceRetryBtn.style.display = "none";
   document.getElementById("hudScore").style.display = "";
@@ -954,7 +957,8 @@ practiceModeBar.addEventListener("click", () => {
   bgm.volume = 0.8;
   spawnBlock(false);
   updateControlButtons();
-  showStartOverlay("retry");
+  showStartOverlay("retry"); // practiceMode=true のまま呼ぶことでsaved値を使う
+  practiceMode = false;      // overlay表示後にリセット
 });
 beatBtn.addEventListener("click", () => {
   beatEnabled = !beatEnabled;
@@ -1199,6 +1203,10 @@ function endGame() {
   bgm.pause();
   bgm.currentTime = 0;
   bgm.volume = 0.8;
+
+  // ゲーム終了時のスコア・格付けを保存（練習モード終了後の表示用）
+  savedScore = score;
+  savedLevelText = levelText;
 
   if (score < 50) playGameOverSound();
 
@@ -1589,9 +1597,11 @@ function processHit(diagnostic, isCorrect) {
     block.fuseX = diagnostic.x;
     block.fuseY = diagnostic.y;
     block.glow = 1;
-    score += 1;
-    updateLevel();
-    updateScoreHUD();
+    if (!practiceMode) {
+      score += 1;
+      updateLevel();
+      updateScoreHUD();
+    }
     createSuccessBurst(block.x, block.y + block.size * 0.18);
     playCorrectSound();
   } else {
