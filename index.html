@@ -552,14 +552,16 @@ const BLOCK_TYPES = [
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅳ音 (S4)", sound:"S4.mp3",     difficulty:1 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"Ⅲ音 (S3)", sound:"S3.mp3",     difficulty:1 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","ギャロップ"], correct:"ギャロップ", sound:"gallop.mp3", difficulty:1 },
-  { labels:["収縮期駆出性雑音","全収縮期雑音","収縮後期雑音","収縮早期雑音"], correct:"収縮期駆出性雑音",   sound:"SEM.mp3",    difficulty:1 },
-  { labels:["収縮期駆出性雑音","全収縮期雑音","収縮後期雑音","収縮早期雑音"], correct:"全収縮期雑音", sound:"HSM.mp3",    difficulty:1},
+  { labels:["駆出性雑音（収縮中期）","逆流性雑音（全収縮期）","拡張期雑音","往復雑音"], correct:"駆出性雑音（収縮中期）",   sound:"SEM.mp3",    difficulty:1 },
+  { labels:["駆出性雑音（収縮中期）","逆流性雑音（全収縮期）","拡張期雑音","往復雑音"], correct:"逆流性雑音（全収縮期）", sound:"HSM.mp3",    difficulty:1},
+  { labels:["駆出性雑音（収縮中期）","逆流性雑音（全収縮期）","拡張期雑音","往復雑音"], correct:"拡張期雑音", sound:"HDM.mp3",    difficulty:1},
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","正常","クリック"],  correct:"クリック",  sound:"click.mp3",  difficulty:2 },
   { labels:["往復雑音","心膜摩擦音","連続性雑音","ギャロップ"],     correct:"心膜摩擦音",     sound:"rub.mp3",    difficulty:2 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","Ⅱ音肺動脈成分の亢進"], correct:"Ⅱ音肺動脈成分の亢進", sound:"2P.mp3", difficulty:2 },
   { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"],     correct:"往復雑音",       sound:"TAF.mp3",    difficulty:2 },
   { labels:["収縮期雑音","拡張期雑音","往復雑音","連続性雑音"],     correct:"連続性雑音",     sound:"CM.mp3",     difficulty:3 },
-  { labels:["収縮期駆出性雑音","全収縮期雑音","収縮後期雑音","収縮早期雑音"], correct:"収縮後期雑音",       sound:"LSM.mp3",    difficulty:3 },
+  { labels:["駆出性雑音（収縮中期）","逆流性雑音（全収縮期）","逆流性雑音（収縮前期）","逆流性雑音（収縮後期）"], correct:"逆流性雑音（収縮後期）",       sound:"LSM.mp3",    difficulty:3 },
+  { labels:["駆出性雑音（収縮中期）","逆流性雑音（全収縮期）","逆流性雑音（収縮前期）","逆流性雑音（収縮後期）"], correct:"逆流性雑音（収縮前期）",       sound:"ESM.mp3",    difficulty:3 },
   { labels:["ランブル","心膜摩擦音","連続性雑音","ギャロップ"],     correct:"ランブル",       sound:"rumble.mp3", difficulty:3 },
   { labels:["Ⅲ音 (S3)","Ⅳ音 (S4)","クリック","駆出音"], correct:"駆出音",   sound:"ej.mp3",     difficulty:3 },
   { labels:["正常（心基部）","正常（心尖部）","Ⅲ音 (S3)","Ⅳ音 (S4)"],     correct:"正常（心尖部）",       sound:"apex.mp3", difficulty:3 },
@@ -1252,6 +1254,20 @@ const BEAT_PATTERNS = {
     bpm: 75, 
     strength: [1.0, 0.7, 0.6],
     duration: [0.06, 0.05, 0.05]
+  },
+  // 拡張期雑音（HDM）
+  "HDM.mp3": { 
+    beats: [0, 0.40], 
+    bpm: 70, 
+    strength: [1.0, 0.75],
+    duration: [0.08, 0.18]
+  },
+  // 逆流性雑音（収縮前期）- ESM
+  "ESM.mp3": { 
+    beats: [0, 0.30], 
+    bpm: 72, 
+    strength: [1.0, 0.70],
+    duration: [0.08, 0.10]
   },
   // ランブル - 拡張期ランブル
   "rumble.mp3": { 
