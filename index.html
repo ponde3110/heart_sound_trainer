@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>心音マイスターへ Heart Sound Trainer</title>
+<title>心音マイスター Heart Sound Meister</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
@@ -559,8 +559,8 @@
 <div id="startOverlay">
 
   <div class="start-panel">
-    <div class="start-badge">HEART SOUND TRAINER</div>
-    <h1 id="startHeading">心音マイスターへ</h1>
+    <div class="start-badge">Heart Sound Meister</div>
+    <h1 id="startHeading">心音マイスター </h1>
     <p id="startSub"></p>
     <div id="overlayScore"></div>
 
@@ -815,7 +815,7 @@ function updateControlButtons() {
 function showStartOverlay(mode = "start") {
   startOverlay.classList.remove("hidden");
   if (mode === "start") {
-    startHeading.textContent = "心音マイスターへ";
+    startHeading.textContent = "心音マイスター";
     startSub.textContent = "";
     if (isMaister) {
   overlayScore.style.display = "none";
